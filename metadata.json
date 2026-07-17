@@ -1,0 +1,6 @@
+{
+  "name": "Paisa Blueprint",
+  "description": "A comprehensive personal finance platform for Indian salaried employees. Features a financial health score, government employee salary planners, goal calculators, tax estimators, and an AI financial coach.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

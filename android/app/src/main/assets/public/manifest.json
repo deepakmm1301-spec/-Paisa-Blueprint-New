@@ -1,0 +1,22 @@
+{
+  "name": "Paisa Blueprint • Salaried Employee Hub",
+  "short_name": "PaisaBlueprint",
+  "description": "Calculators for 8th Pay Commission, BPSC Teacher Salary, NPS, DA, SIP, and real-time Bihar educational & governance news.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#ea580c",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -1,0 +1,387 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Caveat:wght@400;700&family=Architects+Daughter&display=swap');
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-bhagwa-50: #ecfdf5;
+  --color-bhagwa-100: #d1fae5;
+  --color-bhagwa-200: #a7f3d0;
+  --color-bhagwa-500: #10b981;
+  --color-bhagwa-600: #059669;
+  --color-bhagwa-700: #047857;
+  --color-bhagwa-800: #065f46;
+  --color-bhagwa-900: #064e3b;
+  --color-bhagwa-950: #022c22;
+}
+
+/* Custom styled scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
+/* Base custom classes to match the Swiss / High-End Design */
+body {
+  font-family: var(--font-sans);
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  color: #0a1e3d; /* Premium deep navy for all headings */
+}
+
+/* ==========================================================================
+   HIGH-CONTRAST NIGHT-TIME DARK MODE RULES
+   ========================================================================== */
+.dark {
+  color-scheme: dark;
+}
+
+/* Base Document Overrides */
+.dark body {
+  background-color: #020617 !important; /* Pitch black slate */
+  color: #f1f5f9 !important;
+}
+
+/* Header & Glassmorphism Navigation */
+.dark header,
+.dark header.bg-white\/90 {
+  background-color: #050f1d !important; /* Cozy midnight dark navy */
+  border-color: #122138 !important;
+}
+
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark h5,
+.dark h6 {
+  color: #f8fafc !important;
+}
+
+/* Card & Content Panel Backings */
+.dark .bg-white,
+.dark .bg-white\/80 {
+  background-color: #090d16 !important; /* Ultra-soothing midnight container dark */
+  border-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+/* Universal Boarders & Dividers for crisp layout */
+.dark .border-slate-50,
+.dark .border-slate-100,
+.dark .border-slate-110,
+.dark .border-slate-150,
+.dark .border-slate-200,
+.dark .border-slate-300,
+.dark .border-slate-100\/80 {
+  border-color: #1e293b !important;
+}
+
+/* Input elements and Form controls */
+.dark input[type="text"],
+.dark input[type="number"],
+.dark input[type="email"],
+.dark input[type="password"],
+.dark select,
+.dark textarea {
+  background-color: #111a2e !important;
+  border-color: #1e293b !important;
+  color: #ffffff !important;
+}
+
+.dark input[type="text"]:focus,
+.dark input[type="number"]:focus,
+.dark select:focus {
+  border-color: #f55a00 !important;
+  outline: none !important;
+}
+
+/* Soft, night-themed notification alerts & accent blocks */
+.dark .bg-slate-50,
+.dark .bg-slate-50\/40,
+.dark .bg-slate-50\/50,
+.dark .bg-slate-100\/60 {
+  background-color: #0d1527 !important;
+  color: #cbd5e1 !important;
+}
+
+.dark .bg-slate-100 {
+  background-color: #1e293b !important;
+}
+
+.dark .bg-slate-50\/50 {
+  background-color: #020617 !important;
+}
+
+/* Secondary & Muted Typography elements */
+.dark .text-slate-950,
+.dark .text-slate-900,
+.dark .text-slate-850,
+.dark .text-slate-800,
+.dark .text-slate-750,
+.dark .text-slate-700 {
+  color: #f8fafc !important;
+}
+
+.dark .text-slate-650,
+.dark .text-slate-600 {
+  color: #cbd5e1 !important;
+}
+
+.dark .text-slate-500,
+.dark .text-slate-450,
+.dark .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+/* Indian Premium Bhagwa & Orange Theme accents */
+.dark .bg-bhagwa-50 {
+  background-color: #022c22 !important;
+  border-color: #065f46 !important;
+  color: #6ee7b7 !important;
+}
+
+.dark .text-bhagwa-600,
+.dark .text-orange-600 {
+  color: #34d399 !important;
+}
+
+.dark .bg-orange-50 {
+  background-color: #022c22 !important;
+  border-color: #065f46 !important;
+}
+
+.dark .bg-bhagwa-100 {
+  background-color: #064e3b !important;
+  color: #cbd5e1 !important;
+}
+
+/* Safe Green Highlights and Scoreboards */
+.dark .bg-emerald-50 {
+  background-color: #022c15 !important;
+  border-color: #054e20 !important;
+  color: #34d399 !important;
+}
+
+.dark .text-emerald-600,
+.dark .text-emerald-700 {
+  color: #4ade80 !important;
+}
+
+.dark .bg-emerald-500 {
+  background-color: #10b981 !important;
+  color: #ffffff !important;
+}
+
+/* Sky and Landmark assets */
+.dark .bg-sky-50 {
+  background-color: #032034 !important;
+  border-color: #054060 !important;
+}
+
+.dark .text-sky-600 {
+  color: #38bdf8 !important;
+}
+
+/* Net Worth trackers & Blue badges */
+.dark .bg-blue-50 {
+  background-color: #041a35 !important;
+  border-color: #07356a !important;
+}
+
+.dark .text-blue-600 {
+  color: #60a5fa !important;
+}
+
+/* Red flags, Warnings & Rose highlights */
+.dark .bg-rose-50 {
+  background-color: #300a10 !important;
+  border-color: #580d19 !important;
+}
+
+.dark .text-rose-600 {
+  color: #f87171 !important;
+}
+
+/* Violet and Compounding calculators */
+.dark .bg-violet-50 {
+  background-color: #200a35 !important;
+  border-color: #401060 !important;
+}
+
+.dark .text-violet-600 {
+  color: #c084fc !important;
+}
+
+/* Yellow and tax bracket configurations */
+.dark .bg-amber-50 {
+  background-color: #241c03 !important;
+  border-color: #483405 !important;
+}
+
+.dark .text-amber-600 {
+  color: #fbbf24 !important;
+}
+
+/* Active sidebar item font protection */
+.dark .bg-bhagwa-600.text-white {
+  background-color: #059669 !important;
+  color: #ffffff !important;
+}
+
+/* Secondary list items standard hover */
+.dark .hover\:bg-slate-50:hover {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+}
+
+/* Chart visualization dark adaptation */
+.dark .recharts-cartesian-grid-horizontal line,
+.dark .recharts-cartesian-grid-vertical line {
+  stroke: #1e293b !important;
+}
+
+.dark .recharts-text {
+  fill: #94a3b8 !important;
+}
+
+.dark .recharts-legend-item-text {
+  color: #cbd5e1 !important;
+}
+
+.dark .recharts-tooltip-cursor {
+  fill: #1e293b !important;
+}
+
+.dark .recharts-default-tooltip {
+  background-color: #090d16 !important;
+  border-color: #1e293b !important;
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   Print Styles for Professional Direct-from-Browser Printing
+   ========================================================================== */
+@media print {
+  /* Hide headers, sidebars, buttons, and speculative text warnings during print */
+  header,
+  footer,
+  aside,
+  nav,
+  button,
+  .print\:hidden,
+  .no-print,
+  #brand-tagline-hero,
+  #welcome-overlay {
+    display: none !important;
+  }
+
+  /* Force content container to span full page width */
+  body, html, main {
+    background: #ffffff !important;
+    color: #000000 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Reset main column constraints for full width */
+  section.lg\:col-span-6,
+  main section,
+  .lg\:col-span-6,
+  .lg\:col-span-7,
+  .lg\:col-span-5 {
+    grid-column: span 12 / span 12 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Adjust grid systems to output flat stack items */
+  .grid, .grid-cols-1, .lg\:grid-cols-12 {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  /* Clean up white backgrounds for printed cards */
+  .bg-white, .dark\:bg-slate-850, .bg-slate-50, .dark\:bg-slate-900 {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+    box-shadow: none !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    margin-bottom: 20px !important;
+  }
+
+  /* Print safe typography */
+  h1, h2, h3, h4, h5, h6 {
+    color: #000000 !important;
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  p, span, li, td, th, label {
+    color: #334155 !important;
+  }
+
+  /* Avoid splitting logical cards mid-page */
+  .rounded-2xl, .rounded-3xl, .shadow-sm, .border {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Render simple table layouts clearly */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  th, td {
+    border-bottom: 1px solid #e2e8f0 !important;
+    padding: 8px !important;
+    text-align: left !important;
+  }
+}
+
+/* ==========================================================================
+   BPSC Teacher Portal Custom Animation Effects
+   ========================================================================== */
+@keyframes attention-blink {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.03);
+  }
+}
+
+.animate-blink-attention {
+  animation: attention-blink 2s infinite ease-in-out;
+}
+
+
+

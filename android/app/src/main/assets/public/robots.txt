@@ -1,0 +1,28 @@
+User-agent: *
+Allow: /
+
+# Prevent indexing of query parameter URLs to avoid duplicate content indexing
+Disallow: /*?*
+
+# Explicitly allow primary calculators and sections
+Allow: /bpsc-teacher-salary-calculator
+Allow: /salary-calculator
+Allow: /sip-calculator
+Allow: /nps-calculator
+Allow: /pension-calculator
+Allow: /da-calculator
+Allow: /8th-pay-commission-salary-calculator
+Allow: /teacher-hub
+Allow: /mutual-transfer
+Allow: /petitions
+
+# Disallow authentication and administrative backends
+Disallow: /login
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /verify-email
+Disallow: /admin
+Disallow: /admin-portal
+
+Sitemap: https://www.paisablueprint.in/sitemap.xml
