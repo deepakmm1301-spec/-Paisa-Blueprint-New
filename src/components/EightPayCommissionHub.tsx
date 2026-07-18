@@ -236,7 +236,7 @@ export default function EightPayCommissionHub({ activeSubPage, onNavigate, langu
   const inHandNew = grossNew - npsNew;
 
   const shareToWhatsApp = () => {
-    const currentUrl = getShareableLink("eight_pay_calc", "/8th-pay-commission-salary-calculator");
+    const currentUrl = getShareableLink("eight_pay_calc", "/8th-pay-commission-calculator");
     const text = language === "hi"
       ? `📊 *8वां वेतन आयोग (8th Pay Commission) सैलरी कैलकुलेटर*\n\nवर्तमान मूल वेतन: ₹${basicPay.toLocaleString("en-IN")}\nअनुमानित फिटमेंट फैक्टर: ${fitmentFactor}x\n*अनुमानित संशोधित 8वां मूल वेतन: ₹${calculatedRevisedBasic.toLocaleString("en-IN")}*\nअनुमानित संशोधित सकल मासिक वेतन (Gross): ₹${Math.round(grossNew).toLocaleString("en-IN")}/माह (+₹${Math.round(grossNew - grossOld).toLocaleString("en-IN")} यानी +${((grossNew - grossOld) / grossOld * 100).toFixed(1)}% की वृद्धि)\nअनुमानित इन-हैंड वेतन (Net In-Hand): ₹${Math.round(inHandNew).toLocaleString("en-IN")}/माह\n\nअपने 8वें वेतन आयोग के वेतन, कुल बढ़ोतरी और पेंशन की तुरंत गणना करें: ${currentUrl}`
       : `📊 *8th Pay Commission Salary Calculator 2026*\n\nCurrent Basic Pay: ₹${basicPay.toLocaleString("en-IN")}\nAssumed Fitment Factor: ${fitmentFactor}x\n*Estimated Revised 8th CPC Basic Pay: ₹${calculatedRevisedBasic.toLocaleString("en-IN")}*\nEstimated Revised Gross Salary: ₹${Math.round(grossNew).toLocaleString("en-IN")}/month (+₹${Math.round(grossNew - grossOld).toLocaleString("en-IN")} | +${((grossNew - grossOld) / grossOld * 100).toFixed(1)}% hike)\nEstimated Net In-Hand Salary: ₹${Math.round(inHandNew).toLocaleString("en-IN")}/month\n\nCalculate your 8th Pay basic, gross, hike & pension instantly here: ${currentUrl}`;

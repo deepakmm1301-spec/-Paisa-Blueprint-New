@@ -519,7 +519,7 @@ export default function App() {
     if (widget === "reset_password") return "/reset-password";
     if (widget === "verify_email") return "/verify-email";
     if (widget === "dashboard") return "/dashboard";
-    if (widget === "eight_pay_calc") return "/8th-pay-commission-salary-calculator";
+    if (widget === "eight_pay_calc") return "/8th-pay-commission-calculator";
     if (widget === "profiles") return "/profiles";
     if (widget === "bpsc_salary") return "/";
     if (widget === "bihar_da") return "/da-calculator";

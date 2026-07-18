@@ -385,7 +385,7 @@ const defaultCmsDb: CmsDbSchema = {
     copyright: "© 2026 Paisa Blueprint. Independent advocacy platform built for Bihar Government State Teachers.",
     quickLinks: [
       { label: "BPSC Teacher Salary", url: "/bpsc-teacher-salary-calculator" },
-      { label: "8th Pay Commission Guide", url: "/8th-pay-commission-salary-calculator" },
+      { label: "8th Pay Commission Guide", url: "/8th-pay-commission-calculator" },
       { label: "Mutual Transfer Guidelines", url: "/teacher-hub" },
       { label: "Sign Demands Petition", url: "/petitions" }
     ],
