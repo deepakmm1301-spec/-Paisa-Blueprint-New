@@ -455,105 +455,124 @@ export default function AndroidNativeWrapper({
             initial={{ opacity: 1 }}
             exit={{ opacity: 0, scale: 1.05 }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="fixed inset-0 z-[100000] bg-[#0b021d] flex flex-col items-center justify-between py-12 px-6 text-center select-none pointer-events-auto overflow-hidden"
+            className="fixed inset-0 z-[100000] bg-gradient-to-b from-[#140028] via-[#1c0038] to-[#25004a] flex flex-col items-center justify-between py-12 px-6 text-center select-none pointer-events-auto overflow-hidden"
           >
-            {/* Ambient Lighting / Halos */}
-            <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[450px] h-[450px] bg-purple-600/15 rounded-full blur-[100px] pointer-events-none" />
-            <div className="absolute bottom-1/4 left-1/2 -translate-x-1/2 w-[350px] h-[350px] bg-indigo-900/10 rounded-full blur-[80px] pointer-events-none" />
+            {/* Lighter, brighter purple radial spotlights behind the logo & title for ultra-high contrast and readability */}
+            <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-purple-500/35 rounded-full blur-[130px] pointer-events-none z-0 animate-pulse" />
+            <div className="absolute bottom-[20%] left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-indigo-500/25 rounded-full blur-[110px] pointer-events-none z-0" />
+            <div className="absolute top-[35%] left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-[#B84DFF]/25 rounded-full blur-[90px] pointer-events-none z-0" />
 
             {/* Sparkles / Stars */}
-            <div className="absolute top-[15%] left-[20%] text-[10px] text-purple-400/40 animate-pulse pointer-events-none">✦</div>
-            <div className="absolute top-[25%] right-[15%] text-xs text-purple-300/30 animate-pulse pointer-events-none" style={{ animationDelay: "0.5s" }}>✦</div>
-            <div className="absolute top-[45%] left-[10%] text-sm text-purple-400/25 animate-pulse pointer-events-none" style={{ animationDelay: "1.2s" }}>✦</div>
-            <div className="absolute top-[65%] right-[25%] text-[11px] text-purple-500/30 animate-pulse pointer-events-none" style={{ animationDelay: "0.8s" }}>✦</div>
-            <div className="absolute bottom-[20%] left-[25%] text-xs text-purple-400/40 animate-pulse pointer-events-none" style={{ animationDelay: "1.5s" }}>✦</div>
+            <div className="absolute top-[12%] left-[18%] text-sm text-purple-300/60 animate-pulse pointer-events-none">✦</div>
+            <div className="absolute top-[22%] right-[12%] text-base text-purple-300/50 animate-pulse pointer-events-none" style={{ animationDelay: "0.5s" }}>✦</div>
+            <div className="absolute top-[48%] left-[8%] text-lg text-purple-300/40 animate-pulse pointer-events-none" style={{ animationDelay: "1.2s" }}>✦</div>
+            <div className="absolute top-[62%] right-[22%] text-sm text-purple-400/50 animate-pulse pointer-events-none" style={{ animationDelay: "0.8s" }}>✦</div>
+            <div className="absolute bottom-[22%] left-[22%] text-base text-purple-300/60 animate-pulse pointer-events-none" style={{ animationDelay: "1.5s" }}>✦</div>
 
             {/* Top Language Badge */}
-            <div className="relative z-10 pt-4">
-              <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full border border-purple-500/20 bg-purple-950/20 backdrop-blur-md text-purple-200/90 text-[10px] font-bold tracking-[0.25em] font-mono shadow-[0_0_15px_rgba(168,85,247,0.1)]">
-                <span className="text-purple-400/80">✦</span>
+            <div className="relative z-10 pt-6">
+              <div className="inline-flex items-center gap-3 px-6 py-1.5 rounded-full border border-purple-400/30 bg-purple-950/40 backdrop-blur-md text-purple-50 text-xs md:text-sm font-bold tracking-[0.3em] font-mono shadow-[0_0_20px_rgba(168,85,247,0.25)]">
+                <span className="text-purple-300 text-xs animate-pulse">✦</span>
                 <span>{language === "hi" ? "हिंदी" : "ENGLISH"}</span>
-                <span className="text-purple-400/80">✦</span>
+                <span className="text-purple-300 text-xs animate-pulse">✦</span>
               </div>
             </div>
 
             {/* Center Content Group */}
             <div className="flex flex-col items-center relative z-10 my-auto">
-              {/* Logo with Outer Ring Halo */}
-              <div className="relative mb-6">
-                <div className="absolute -inset-4 bg-purple-500/25 rounded-full blur-2xl animate-pulse" />
-                <div className="relative w-32 h-32 md:w-36 md:h-36 rounded-[2.2rem] bg-gradient-to-b from-[#150a2e] to-[#0a0015] border-2 border-purple-500/60 flex items-center justify-center shadow-[0_0_35px_rgba(168,85,247,0.4)] overflow-hidden">
-                  <div className="absolute inset-0 bg-radial-gradient from-purple-500/20 to-transparent opacity-60" />
+              {/* Logo with Outer Ring Halo & Vibrant Glow */}
+              <div className="relative mb-8 flex items-center justify-center">
+                {/* Vibrant background glow spotlight behind the logo block */}
+                <div className="absolute w-52 h-52 md:w-60 md:h-60 rounded-full bg-[#B84DFF]/50 blur-3xl animate-pulse pointer-events-none" />
+                
+                {/* Concentric bright purple glowing rings matching the mockup */}
+                <div className="absolute -inset-4 rounded-full border-2 border-[#B84DFF]/50 shadow-[0_0_35px_rgba(184,77,255,0.6)] pointer-events-none scale-105" />
+                <div className="absolute -inset-8 rounded-full border border-[#7B2EFF]/30 pointer-events-none scale-110" />
+                
+                <div className="absolute w-52 h-52 md:w-60 md:h-60 rounded-full border-2 border-purple-400/40 shadow-[0_0_25px_rgba(168,85,247,0.3)] flex items-center justify-center pointer-events-none animate-pulse">
+                  <div className="w-48 h-48 md:w-56 md:h-56 rounded-full border border-dashed border-purple-500/35" />
+                </div>
+
+                {/* Main rounded square logo block matching premium fintech look */}
+                <div className="relative w-28 h-28 md:w-32 md:h-32 rounded-3xl bg-gradient-to-b from-[#24124e] to-[#0a011a] border-2 border-[#B84DFF] flex items-center justify-center shadow-[0_0_50px_rgba(184,77,255,0.85)] overflow-hidden z-10">
+                  <div className="absolute inset-0 bg-radial-gradient from-purple-500/40 to-transparent opacity-95" />
                   <img 
                     src={paisaLogo} 
                     alt="Paisa Blueprint" 
-                    className="w-22 h-22 md:w-26 md:h-26 object-contain relative z-10"
+                    className="w-18 h-18 md:w-22 md:h-22 object-contain relative z-10 filter drop-shadow-[0_0_12px_rgba(245,179,53,0.5)]"
                     referrerPolicy="no-referrer"
                   />
                 </div>
               </div>
 
-              {/* Heavy Stylish Typography Title */}
-              <div className="mb-4">
+              {/* Heavy Stylish Typography Title - Slight big size for maximum legibility */}
+              <div className="mb-6">
                 {language === "hi" ? (
                   <div className="space-y-1">
-                    <h2 className="text-3.5xl md:text-4.5xl font-black text-white tracking-wider leading-none">पैसा</h2>
-                    <h2 className="text-3.5xl md:text-4.5xl font-black text-purple-400 tracking-wider leading-none mt-1">ब्लूप्रिंट</h2>
+                    <h2 className="text-[44px] md:text-[56px] font-black text-white tracking-wider leading-none drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]">पैसा</h2>
+                    <h2 className="text-[44px] md:text-[56px] font-black bg-gradient-to-r from-[#FFFFFF] to-[#B84DFF] bg-clip-text text-transparent tracking-wider leading-none mt-2 drop-shadow-[0_2px_15px_rgba(168,85,247,0.7)]">ब्लूप्रिंट</h2>
                   </div>
                 ) : (
                   <div className="space-y-1">
-                    <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-[0.15em] font-sans leading-none uppercase">PAISA</h2>
-                    <h2 className="text-3xl md:text-4xl font-extrabold text-purple-400 tracking-[0.15em] font-sans leading-none uppercase mt-1">BLUEPRINT</h2>
+                    <h2 className="text-[42px] md:text-[52px] font-extrabold text-white tracking-[0.15em] font-sans leading-none uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]">PAISA</h2>
+                    <h2 className="text-[42px] md:text-[52px] font-extrabold bg-gradient-to-r from-[#FFFFFF] to-[#B84DFF] bg-clip-text text-transparent tracking-[0.15em] font-sans leading-none uppercase mt-2 drop-shadow-[0_2px_15px_rgba(168,85,247,0.7)]">BLUEPRINT</h2>
                   </div>
                 )}
               </div>
 
               {/* Elegant central lotus divider */}
-              <div className="flex items-center justify-center w-40 my-3.5">
-                <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-purple-500/30" />
-                <LotusSVG className="w-5 h-5 mx-3 text-purple-400/50" />
-                <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-purple-500/30" />
+              <div className="flex items-center justify-center w-52 my-5">
+                <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-purple-400/50" />
+                <LotusSVG className="w-6 h-6 mx-4 text-purple-300/80" />
+                <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-purple-400/50" />
               </div>
 
-              {/* Pill Badge for Salaried */}
-              <div className="mb-5 relative inline-flex items-center gap-1.5 px-6 py-1 rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-fuchsia-600 shadow-[0_0_20px_rgba(124,58,237,0.35)] text-[10px] font-black uppercase tracking-widest text-white border border-purple-400/20">
+              {/* Pill Badge for Salaried with exact requested gradient (#8A2BE2 → #C84DFF) */}
+              <div className="mb-6 relative inline-flex items-center gap-2.5 px-8 py-2 rounded-full bg-gradient-to-r from-[#8A2BE2] to-[#C84DFF] shadow-[0_0_25px_rgba(200,77,255,0.6)] text-xs md:text-sm font-black uppercase tracking-[0.25em] text-white border border-white/20">
                 <span>SALARIED</span>
-                <span className="text-[11px]">💳</span>
+                <span>🇮🇳</span>
               </div>
 
-              {/* Bilingual Subtitle */}
-              <div className="flex items-center justify-center gap-3 px-4 max-w-sm">
-                <span className="text-purple-500/50 text-xs animate-pulse">✦</span>
-                <p className="text-[11px] md:text-xs font-semibold text-purple-200/85 tracking-wide leading-relaxed font-sans">
+              {/* Bilingual Subtitle - Slight big font and clearly visible */}
+              <div className="flex flex-col items-center justify-center gap-2 px-6 max-w-lg">
+                <p className="text-[16px] md:text-[19px] font-bold text-white tracking-wide leading-relaxed font-sans drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]">
                   {language === "hi" 
-                    ? "स्मार्ट प्लानिंग आज, आर्थिक स्वतंत्रता कल." 
-                    : "Smart Planning Today, Financial Freedom Tomorrow."}
+                    ? "स्मार्ट योजना आज," 
+                    : "Smart Planning Today."}
                 </p>
-                <span className="text-purple-500/50 text-xs animate-pulse">✦</span>
+                <p className="text-[16px] md:text-[19px] font-bold text-white tracking-wide leading-relaxed font-sans drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]">
+                  {language === "hi" 
+                    ? "आर्थिक स्वतंत्रता कल।" 
+                    : "Financial Freedom Tomorrow."}
+                </p>
               </div>
             </div>
 
-            {/* Giant Bottom Lotus Vector Background */}
-            <div className="absolute bottom-[4%] left-1/2 -translate-x-1/2 w-full max-w-[280px] md:max-w-[340px] opacity-20 pointer-events-none z-0 text-purple-500">
+            {/* Giant Bottom Lotus Vector Background - strictly 10% opacity as requested */}
+            <div className="absolute bottom-[4%] left-1/2 -translate-x-1/2 w-full max-w-[320px] md:max-w-[400px] opacity-[0.10] pointer-events-none z-0 text-purple-400">
               <LotusSVG className="w-full h-auto" />
             </div>
 
-            {/* Bottom Section - Progress Bar */}
-            <div className="w-full max-w-[240px] md:max-w-[280px] space-y-3.5 relative z-10 mb-6">
-              {/* Progress track */}
-              <div className="w-full h-[3px] bg-purple-950/50 rounded-full overflow-hidden border border-purple-500/10 shadow-[inset_0_1px_2px_rgba(0,0,0,0.6)]">
+            {/* Bottom Section - Progress Bar & Wording */}
+            <div className="w-full max-w-[280px] md:max-w-[340px] space-y-4 relative z-10 mb-8">
+              {/* Progress track with glowing loading line */}
+              <div className="w-full h-[4px] bg-purple-950/60 rounded-full overflow-hidden border border-purple-500/20 shadow-[inset_0_1px_3px_rgba(0,0,0,0.8)]">
                 <motion.div
                   initial={{ width: "0%" }}
                   animate={{ width: "100%" }}
                   transition={{ duration: 1.9, ease: "easeInOut" }}
-                  className="h-full bg-gradient-to-r from-fuchsia-500 via-purple-500 to-indigo-500 shadow-[0_0_10px_#d946ef]"
+                  className="h-full bg-gradient-to-r from-[#7B2EFF] to-[#B84DFF] shadow-[0_0_18px_#B84DFF,0_0_8px_#7B2EFF]"
                 />
               </div>
-              {/* Loading status text */}
-              <p className="text-[9px] font-bold text-purple-300/70 uppercase tracking-[0.3em] font-mono animate-pulse flex items-center justify-center gap-1">
-                <span className="text-[8px] opacity-60">✦</span>
-                <span>{language === "hi" ? "लोड हो रहा है . . ." : "L o a d i n g . . ."}</span>
-                <span className="text-[8px] opacity-60">✦</span>
+              {/* Loading status text with exact requested wording & big visible font size */}
+              <p className="text-[13px] md:text-[15px] font-extrabold text-purple-200 uppercase tracking-[0.25em] font-sans animate-pulse flex items-center justify-center gap-2 drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]">
+                <span className="text-purple-400 text-xs">✦</span>
+                <span>
+                  {language === "hi" 
+                    ? "आपकी वित्तीय यात्रा शुरू हो रही है..." 
+                    : "Loading your financial journey..."}
+                </span>
+                <span className="text-purple-400 text-xs">✦</span>
               </p>
             </div>
           </motion.div>
