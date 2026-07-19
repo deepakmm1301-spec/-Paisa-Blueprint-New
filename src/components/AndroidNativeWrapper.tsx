@@ -397,11 +397,11 @@ export default function AndroidNativeWrapper({
               {/* Logo Halo */}
               <div className="relative">
                 <div className="absolute inset-0 bg-red-500/15 rounded-3xl blur-md" />
-                <div className="relative h-20 w-20 rounded-3xl bg-slate-950 flex items-center justify-center border border-slate-800 shadow-xl">
+                <div className="relative h-20 w-20 rounded-3xl bg-slate-950 flex items-center justify-center border border-slate-800 shadow-xl overflow-hidden">
                   <img 
                     src={paisaLogo} 
                     alt="Paisa Blueprint" 
-                    className="w-14 h-14 object-cover shrink-0 grayscale"
+                    className="w-full h-full object-contain p-1 shrink-0 grayscale"
                     referrerPolicy="no-referrer"
                   />
                   <div className="absolute -bottom-1 -right-1 bg-red-500 text-white p-1 rounded-full border border-slate-900 shadow-md">

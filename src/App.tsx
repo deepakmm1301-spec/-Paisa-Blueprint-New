@@ -1323,23 +1323,26 @@ export default function App() {
                 {/* Brand Logo & Animated Purple Ambient Halo */}
                 <div className="relative">
                   <div className="absolute inset-0 bg-purple-500/20 rounded-2xl blur-md animate-pulse" />
-                  <div className="relative h-16 w-16 rounded-2xl bg-gradient-to-tr from-slate-950 to-slate-900 flex items-center justify-center shadow-xl border border-purple-500/40">
+                  <div className="relative h-16 w-16 rounded-2xl bg-gradient-to-tr from-slate-950 to-slate-900 flex items-center justify-center shadow-xl border border-purple-500/40 overflow-hidden">
                     <img
                       src={paisaLogo}
                       alt="Paisa Blueprint"
-                      className="w-11 h-11 object-cover shrink-0"
+                      className="w-full h-full p-1.5 object-contain shrink-0"
                       referrerPolicy="no-referrer"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-1.5 w-full">
-                  <h3 className="text-2xl font-black text-white tracking-tight uppercase font-display flex items-center justify-center gap-1.5">
-                    <Sparkles className="w-5 h-5 text-purple-400 animate-pulse" />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-fuchsia-400 to-indigo-300">
-                      Paisa Blueprint
-                    </span>
-                    <Sparkles className="w-5 h-5 text-purple-400 animate-pulse" />
+                <div className="space-y-3 w-full">
+                  {/* English Title */}
+                  <h3 className="text-2xl sm:text-3xl font-black tracking-tight font-display flex items-center justify-center gap-1.5 leading-none">
+                    <span className="text-white">PAISA</span>
+                    <span className="text-[#6A0DAD] drop-shadow-[0_0_20px_rgba(106,13,173,0.95)] drop-shadow-[0_0_35px_rgba(106,13,173,0.7)]">BLUEPRINT</span>
+                  </h3>
+                  {/* Hindi Title */}
+                  <h3 className="text-2xl sm:text-3xl font-black tracking-tight font-display flex items-center justify-center gap-1.5 leading-none">
+                    <span className="text-white">पैसा</span>
+                    <span className="text-[#6A0DAD] drop-shadow-[0_0_20px_rgba(106,13,173,0.95)] drop-shadow-[0_0_35px_rgba(106,13,173,0.7)]">ब्लूप्रिंट</span>
                   </h3>
                   <div className="flex items-center justify-center gap-2">
                     <span className="text-[9px] font-black uppercase bg-purple-600 text-white px-2 py-0.5 rounded-full border border-purple-500/30 tracking-wider">
@@ -1393,7 +1396,7 @@ export default function App() {
               <img 
                 src={paisaLogo} 
                 alt="Paisa Blueprint Logo" 
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain p-0.5"
                 referrerPolicy="no-referrer"
               />
             </div>
