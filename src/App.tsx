@@ -80,7 +80,8 @@ import {
   LogIn,
   LogOut,
   UserPlus,
-  Clock
+  Clock,
+  Megaphone
 } from "lucide-react";
 
 // Default profile setup
@@ -567,6 +568,39 @@ export default function App() {
     };
     checkUserSession();
   }, [activeWidget]);
+
+  // Public CMS announcements states
+  const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [showAnnouncementBanner, setShowAnnouncementBanner] = useState<boolean>(true);
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState<any | null>(null);
+
+  useEffect(() => {
+    const fetchAnnouncements = async () => {
+      try {
+        const res = await fetch("/api/cms/public");
+        const d = await res.json();
+        if (d.success && d.data?.announcements) {
+          const now = new Date();
+          const active = d.data.announcements.filter((ann: any) => {
+            if (!ann.published) return false;
+            if (ann.startDate && new Date(ann.startDate) > now) return false;
+            if (ann.endDate && new Date(ann.endDate) < now) return false;
+            return true;
+          });
+          // Sort: latest published first
+          active.sort((a: any, b: any) => {
+            const dateA = a.startDate ? new Date(a.startDate).getTime() : 0;
+            const dateB = b.startDate ? new Date(b.startDate).getTime() : 0;
+            return dateB - dateA;
+          });
+          setAnnouncements(active);
+        }
+      } catch (err) {
+        console.error("Error fetching public announcements:", err);
+      }
+    };
+    fetchAnnouncements();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -1577,6 +1611,51 @@ export default function App() {
 
       </header>
 
+      {/* Top Scrolling Announcement Banner (Public CMS Connected) */}
+      {activeWidget === "dashboard" && showAnnouncementBanner && announcements.length > 0 && (
+        <div className="w-full bg-purple-50 border-b border-purple-100 py-2.5 px-4 print:hidden relative z-40 transition-all">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            <div 
+              onClick={() => setSelectedAnnouncement(announcements[0])}
+              className="flex items-center gap-3 cursor-pointer flex-1 min-w-0 group"
+            >
+              <div className="flex items-center gap-1.5 bg-purple-600 text-white text-[10px] font-black px-2.5 py-1 rounded-full shrink-0 tracking-wider">
+                <Megaphone className="w-3 h-3 text-white shrink-0 animate-bounce" />
+                <span>{language === "hi" ? "सूचना" : "ANNOUNCEMENT"}</span>
+              </div>
+              <div className="flex-1 min-w-0 flex items-center gap-2">
+                <p className="text-xs font-bold text-slate-800 hover:text-purple-700 transition-colors truncate">
+                  {announcements[0].title}
+                </p>
+                {announcements[0].priority === "high" && (
+                  <span className="hidden sm:inline-block text-[9px] font-black bg-red-100 text-red-700 px-2 py-0.5 rounded-full animate-pulse">
+                    {language === "hi" ? "अति महत्वपूर्ण" : "HIGH PRIORITY"}
+                  </span>
+                )}
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3 shrink-0">
+              <button 
+                onClick={() => setSelectedAnnouncement(announcements[0])}
+                className="text-[11px] font-black text-purple-700 hover:text-purple-900 transition-colors cursor-pointer border-0 bg-transparent flex items-center gap-0.5"
+              >
+                <span>{language === "hi" ? "पूरा विवरण" : "View Details"}</span>
+                <ChevronRight className="w-3 h-3" />
+              </button>
+              <div className="h-3 w-[1px] bg-slate-200" />
+              <button 
+                onClick={() => setShowAnnouncementBanner(false)}
+                className="text-slate-400 hover:text-red-500 transition-colors cursor-pointer border-0 bg-transparent"
+                title={language === "hi" ? "बंद करें" : "Dismiss"}
+              >
+                <span className="text-base font-bold leading-none">&times;</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Container Layout */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-28 lg:pb-8 flex-1 w-full flex flex-col gap-8">
 
@@ -2292,6 +2371,88 @@ export default function App() {
               </div>
             </motion.div>
           </>
+        )}
+      </AnimatePresence>
+
+      {/* Full Announcement Detail Modal */}
+      <AnimatePresence>
+        {selectedAnnouncement && (
+          <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl border border-slate-100 flex flex-col max-h-[90vh]"
+            >
+              <div className="relative p-6 sm:p-8 overflow-y-auto">
+                <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-purple-600 to-indigo-600" />
+                
+                <div className="flex items-start justify-between gap-4 mt-2">
+                  <div className="h-12 w-12 rounded-2xl bg-purple-100 flex items-center justify-center text-purple-600 shrink-0">
+                    <Megaphone className="w-6 h-6" />
+                  </div>
+                  <button 
+                    onClick={() => setSelectedAnnouncement(null)}
+                    className="h-8 w-8 rounded-full hover:bg-slate-150 text-slate-400 hover:text-slate-650 flex items-center justify-center transition-all cursor-pointer border-0 bg-transparent"
+                  >
+                    <span className="text-xl font-bold leading-none">&times;</span>
+                  </button>
+                </div>
+
+                <div className="mt-5 space-y-4">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[10px] font-black uppercase bg-purple-600 text-white px-2.5 py-1 rounded-full tracking-wider">
+                      {language === "hi" ? "आधिकारिक सूचना" : "OFFICIAL ANNOUNCEMENT"}
+                    </span>
+                    {selectedAnnouncement.priority === "high" && (
+                      <span className="text-[10px] font-black uppercase bg-red-100 text-red-700 px-2.5 py-1 rounded-full tracking-wider animate-pulse">
+                        {language === "hi" ? "अति महत्वपूर्ण" : "URGENT / HIGH PRIORITY"}
+                      </span>
+                    )}
+                    {selectedAnnouncement.targetAudience && (
+                      <span className="text-[10px] font-black uppercase bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full tracking-wider">
+                        {selectedAnnouncement.targetAudience}
+                      </span>
+                    )}
+                  </div>
+
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
+                    {selectedAnnouncement.title}
+                  </h3>
+
+                  <div className="h-[1px] bg-slate-100 w-full" />
+
+                  <div className="text-slate-600 text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-medium">
+                    {selectedAnnouncement.description}
+                  </div>
+
+                  <div className="h-[1px] bg-slate-100 w-full" />
+
+                  <div className="flex flex-wrap items-center justify-between gap-4 pt-2 text-xs text-slate-400 font-bold font-mono">
+                    <div>
+                      {language === "hi" ? "शुरू तिथि: " : "Start Date: "}
+                      {selectedAnnouncement.startDate ? new Date(selectedAnnouncement.startDate).toLocaleDateString(language === "hi" ? 'hi-IN' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
+                    </div>
+                    {selectedAnnouncement.endDate && (
+                      <div>
+                        {language === "hi" ? "समाप्ति तिथि: " : "End Date: "}
+                        {new Date(selectedAnnouncement.endDate).toLocaleDateString(language === "hi" ? 'hi-IN' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-slate-50 p-4 sm:p-6 border-t border-slate-150 flex justify-end gap-3 shrink-0">
+                <button 
+                  onClick={() => setSelectedAnnouncement(null)}
+                  className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold rounded-xl transition-all cursor-pointer shadow-sm"
+                >
+                  {language === "hi" ? "ठीक है" : "Close Window"}
+                </button>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 

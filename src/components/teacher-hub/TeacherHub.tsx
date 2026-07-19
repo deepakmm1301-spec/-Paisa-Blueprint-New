@@ -22,7 +22,8 @@ import {
   ArrowRight,
   Send,
   MessageSquare,
-  AlertTriangle
+  AlertTriangle,
+  Megaphone
 } from "lucide-react";
 
 interface TeacherHubProps {
@@ -96,6 +97,37 @@ export default function TeacherHub({ language }: TeacherHubProps) {
     updateStats();
     const unsubscribe = globalTeacherStore.subscribe(updateStats);
     return unsubscribe;
+  }, []);
+
+  const [teacherAnnouncements, setTeacherAnnouncements] = useState<any[]>([]);
+  const [selectedAnn, setSelectedAnn] = useState<any | null>(null);
+
+  useEffect(() => {
+    const fetchTeacherAnnouncements = async () => {
+      try {
+        const res = await fetch("/api/cms/public");
+        const d = await res.json();
+        if (d.success && d.data?.announcements) {
+          const now = new Date();
+          const active = d.data.announcements.filter((ann: any) => {
+            if (!ann.published) return false;
+            if (ann.startDate && new Date(ann.startDate) > now) return false;
+            if (ann.endDate && new Date(ann.endDate) < now) return false;
+            const audience = (ann.targetAudience || "").toLowerCase();
+            return audience.includes("teacher") || audience.includes("all") || audience === "";
+          });
+          active.sort((a: any, b: any) => {
+            const dateA = a.startDate ? new Date(a.startDate).getTime() : 0;
+            const dateB = b.startDate ? new Date(b.startDate).getTime() : 0;
+            return dateB - dateA;
+          });
+          setTeacherAnnouncements(active);
+        }
+      } catch (err) {
+        console.error("Error fetching teacher announcements in TeacherHub:", err);
+      }
+    };
+    fetchTeacherAnnouncements();
   }, []);
 
   const handleContactSubmit = (e: React.FormEvent) => {
@@ -519,6 +551,63 @@ export default function TeacherHub({ language }: TeacherHubProps) {
 
                 </div>
 
+                {/* Teacher Hub Official Announcement Panel (Public CMS Connected) */}
+                {teacherAnnouncements.length > 0 && (
+                  <div className="bg-white rounded-3xl border border-slate-100 p-6 sm:p-8 space-y-6 shadow-xs text-left">
+                    <div className="flex items-center gap-2.5">
+                      <div className="h-9 w-9 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center">
+                        <Megaphone className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-black text-slate-900 tracking-tight">
+                          {language === "hi" ? "आधिकारिक घोषणाएं और सूचनाएं" : "Official Announcements & Notices"}
+                        </h3>
+                        <p className="text-xs text-slate-400 font-semibold mt-0.5">
+                          {language === "hi" ? "नवीनतम सूचनाएं एवं विभागीय अपडेट" : "Latest departmental notifications & platform announcements"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {teacherAnnouncements.slice(0, 4).map((ann) => (
+                        <div 
+                          key={ann.id}
+                          onClick={() => setSelectedAnn(ann)}
+                          className="p-5 rounded-2xl bg-slate-50 hover:bg-teal-50/50 border border-slate-100 hover:border-teal-150 transition-all cursor-pointer group flex flex-col justify-between gap-3 h-full"
+                        >
+                          <div className="space-y-2">
+                            <div className="flex flex-wrap items-center gap-2">
+                              {ann.priority === "high" && (
+                                <span className="text-[9px] font-black uppercase bg-red-100 text-red-700 px-2 py-0.5 rounded-full animate-pulse">
+                                  {language === "hi" ? "अति महत्वपूर्ण" : "HIGH"}
+                                </span>
+                              )}
+                              <span className="text-[9px] font-black uppercase bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full">
+                                {ann.targetAudience || (language === "hi" ? "सभी" : "ALL")}
+                              </span>
+                            </div>
+                            <h4 className="text-sm font-black text-slate-800 group-hover:text-teal-850 transition-colors line-clamp-2 leading-snug">
+                              {ann.title}
+                            </h4>
+                            <p className="text-xs text-slate-500 line-clamp-3 leading-relaxed">
+                              {ann.description}
+                            </p>
+                          </div>
+                          
+                          <div className="flex items-center justify-between pt-2 border-t border-slate-150/40 text-[10px] text-slate-400 font-bold font-mono">
+                            <span>
+                              {ann.startDate ? new Date(ann.startDate).toLocaleDateString(language === "hi" ? 'hi-IN' : 'en-US', { day: 'numeric', month: 'short' }) : 'N/A'}
+                            </span>
+                            <span className="text-teal-600 group-hover:translate-x-1 transition-transform flex items-center gap-0.5">
+                              {language === "hi" ? "पूरा पढ़ें" : "Read More"} <ArrowRight className="w-3 h-3" />
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* SHARE PORTAL WIDGET WITH THE EXACT CUSTOMIZED MESSAGE */}
                 <div id="share-portal-section" className="bg-gradient-to-br from-emerald-50/40 via-emerald-50/70 to-teal-50/40 border border-emerald-100/90 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs">
                   <div className="space-y-2 max-w-xl text-left">
@@ -887,6 +976,88 @@ export default function TeacherHub({ language }: TeacherHubProps) {
 
         </div>
       </footer>
+
+      {/* Full Teacher Announcement Detail Modal */}
+      <AnimatePresence>
+        {selectedAnn && (
+          <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl border border-slate-100 flex flex-col max-h-[90vh] text-left"
+            >
+              <div className="relative p-6 sm:p-8 overflow-y-auto">
+                <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-teal-600 to-emerald-600" />
+                
+                <div className="flex items-start justify-between gap-4 mt-2">
+                  <div className="h-12 w-12 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center shrink-0">
+                    <Megaphone className="w-6 h-6" />
+                  </div>
+                  <button 
+                    onClick={() => setSelectedAnn(null)}
+                    className="h-8 w-8 rounded-full hover:bg-slate-150 text-slate-400 hover:text-slate-650 flex items-center justify-center transition-all cursor-pointer border-0 bg-transparent"
+                  >
+                    <span className="text-xl font-bold leading-none">&times;</span>
+                  </button>
+                </div>
+
+                <div className="mt-5 space-y-4">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[10px] font-black uppercase bg-teal-700 text-white px-2.5 py-1 rounded-full tracking-wider">
+                      {language === "hi" ? "आधिकारिक शिक्षक सूचना" : "OFFICIAL TEACHER ANNOUNCEMENT"}
+                    </span>
+                    {selectedAnn.priority === "high" && (
+                      <span className="text-[10px] font-black uppercase bg-red-100 text-red-700 px-2.5 py-1 rounded-full tracking-wider animate-pulse">
+                        {language === "hi" ? "अति महत्वपूर्ण" : "URGENT / HIGH PRIORITY"}
+                      </span>
+                    )}
+                    {selectedAnn.targetAudience && (
+                      <span className="text-[10px] font-black uppercase bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full tracking-wider">
+                        {selectedAnn.targetAudience}
+                      </span>
+                    )}
+                  </div>
+
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
+                    {selectedAnn.title}
+                  </h3>
+
+                  <div className="h-[1px] bg-slate-100 w-full" />
+
+                  <div className="text-slate-600 text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-medium">
+                    {selectedAnn.description}
+                  </div>
+
+                  <div className="h-[1px] bg-slate-100 w-full" />
+
+                  <div className="flex flex-wrap items-center justify-between gap-4 pt-2 text-xs text-slate-400 font-bold font-mono">
+                    <div>
+                      {language === "hi" ? "शुरू तिथि: " : "Start Date: "}
+                      {selectedAnn.startDate ? new Date(selectedAnn.startDate).toLocaleDateString(language === "hi" ? 'hi-IN' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
+                    </div>
+                    {selectedAnn.endDate && (
+                      <div>
+                        {language === "hi" ? "समाप्ति तिथि: " : "End Date: "}
+                        {new Date(selectedAnn.endDate).toLocaleDateString(language === "hi" ? 'hi-IN' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-slate-50 p-4 sm:p-6 border-t border-slate-150 flex justify-end gap-3 shrink-0">
+                <button 
+                  onClick={() => setSelectedAnn(null)}
+                  className="px-5 py-2.5 bg-slate-900 hover:bg-slate-850 text-white text-xs font-extrabold rounded-xl transition-all cursor-pointer shadow-sm"
+                >
+                  {language === "hi" ? "ठीक है" : "Close Window"}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
     </div>
   );

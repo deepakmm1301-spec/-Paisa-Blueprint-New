@@ -24,6 +24,29 @@ export const cmsController = {
   },
 
   /**
+   * Retrieves safe, public CMS database modules for public frontend display
+   */
+  getPublicCmsData: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const db = await cmsModel.readDb();
+      const publicData = {
+        homepage: db.homepage,
+        announcements: db.announcements || [],
+        circulars: db.circulars || [],
+        blogs: db.blogs || [],
+        faqs: db.faqs || [],
+        downloads: db.downloads || [],
+        banners: db.banners || [],
+        navigation: db.navigation || [],
+        footer: db.footer
+      };
+      res.json({ success: true, data: publicData });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
    * Unified updater for any standard CMS module
    */
   updateModule: async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {

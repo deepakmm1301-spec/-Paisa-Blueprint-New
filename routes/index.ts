@@ -80,6 +80,7 @@ router.delete("/petitions/:id", authController.requireAdmin, petitionController.
 // -------------------------------------------------------------
 // CONTENT MANAGEMENT SYSTEM (CMS) ENDPOINTS
 // -------------------------------------------------------------
+router.get("/cms/public", cmsController.getPublicCmsData);
 router.get("/cms/data", requireCmsAccess, cmsController.getCmsData);
 router.post("/cms/update/:moduleId", requireCmsAccess, cmsController.updateModule);
 router.post("/cms/media/upload", requireCmsAccess, cmsController.uploadMedia);
