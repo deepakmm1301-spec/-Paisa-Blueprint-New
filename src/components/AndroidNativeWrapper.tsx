@@ -494,12 +494,12 @@ export default function AndroidNativeWrapper({
                 </div>
 
                 {/* Main rounded square logo block matching premium fintech look */}
-                <div className="relative w-28 h-28 md:w-32 md:h-32 rounded-3xl bg-gradient-to-b from-[#24124e] to-[#0a011a] border-2 border-[#B84DFF] flex items-center justify-center shadow-[0_0_50px_rgba(184,77,255,0.85)] overflow-hidden z-10">
+                <div className="relative w-28 h-28 md:w-32 md:h-32 rounded-3xl bg-gradient-to-b from-[#24124e] to-[#0a011a] border-2 border-[#B84DFF] flex items-center justify-center shadow-[0_0_50px_rgba(184,77,255,0.85)] overflow-hidden z-10 animate-pulse">
                   <div className="absolute inset-0 bg-radial-gradient from-purple-500/40 to-transparent opacity-95" />
                   <img 
                     src={paisaLogo} 
                     alt="Paisa Blueprint" 
-                    className="w-18 h-18 md:w-22 md:h-22 object-contain relative z-10 filter drop-shadow-[0_0_12px_rgba(245,179,53,0.5)]"
+                    className="w-full h-full p-2 object-contain relative z-10 filter drop-shadow-[0_0_15px_rgba(245,179,53,0.6)]"
                     referrerPolicy="no-referrer"
                   />
                 </div>
@@ -510,12 +510,12 @@ export default function AndroidNativeWrapper({
                 {language === "hi" ? (
                   <div className="space-y-1">
                     <h2 className="text-[44px] md:text-[56px] font-black text-white tracking-wider leading-none drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]">पैसा</h2>
-                    <h2 className="text-[44px] md:text-[56px] font-black bg-gradient-to-r from-[#FFFFFF] to-[#B84DFF] bg-clip-text text-transparent tracking-wider leading-none mt-2 drop-shadow-[0_2px_15px_rgba(168,85,247,0.7)]">ब्लूप्रिंट</h2>
+                    <h2 className="text-[44px] md:text-[56px] font-black text-[#6A0DAD] tracking-wider leading-none mt-2 drop-shadow-[0_0_20px_rgba(106,13,173,0.95)] drop-shadow-[0_0_35px_rgba(106,13,173,0.7)]">ब्लूप्रिंट</h2>
                   </div>
                 ) : (
                   <div className="space-y-1">
                     <h2 className="text-[42px] md:text-[52px] font-extrabold text-white tracking-[0.15em] font-sans leading-none uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]">PAISA</h2>
-                    <h2 className="text-[42px] md:text-[52px] font-extrabold bg-gradient-to-r from-[#FFFFFF] to-[#B84DFF] bg-clip-text text-transparent tracking-[0.15em] font-sans leading-none uppercase mt-2 drop-shadow-[0_2px_15px_rgba(168,85,247,0.7)]">BLUEPRINT</h2>
+                    <h2 className="text-[42px] md:text-[52px] font-extrabold text-[#6A0DAD] tracking-[0.15em] font-sans leading-none uppercase mt-2 drop-shadow-[0_0_20px_rgba(106,13,173,0.95)] drop-shadow-[0_0_35px_rgba(106,13,173,0.7)]">BLUEPRINT</h2>
                   </div>
                 )}
               </div>

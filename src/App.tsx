@@ -2139,8 +2139,6 @@ export default function App() {
 
         {/* Right Sidebar: Articles Guidance cabinet */}
         <section className="lg:col-span-3 space-y-6 print:hidden">
-          <MarketInsights language={language} />
-          
           <ArticlesColumn 
             onNavigateToWidget={(widgetId) => {
               setActiveWidget(widgetId);

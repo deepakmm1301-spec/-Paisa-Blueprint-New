@@ -939,31 +939,7 @@ export default function ArticlesColumn({ onNavigateToWidget, userMonthlySalary, 
         )}
       </div>
 
-      {/* Interactive prompt for user salary context */}
-      <div className="bg-slate-950 text-slate-300 p-3.5 rounded-xl border border-slate-800 space-y-2">
-        <span className="text-[8px] uppercase tracking-widest text-emerald-400 font-black block">
-          {language === "hi" ? "सक्रिय वेतन संदर्भ स्थिति" : "Active Salary Context Check"}
-        </span>
-        <p className="text-[10px] text-slate-400 leading-tight">
-          {language === "hi" ? (
-            <>
-              सक्रिय लेज़र में आपका मासिक वेतन{" "}
-              <strong className="text-white font-mono">
-                ₹{userMonthlySalary.toLocaleString("en-IN")}/माह
-              </strong>{" "}
-              दर्ज है। योजना बनाने के लिए हमारे विशेष टूल्स का उपयोग करें।
-            </>
-          ) : (
-            <>
-              Your active ledger salary is registered at{" "}
-              <strong className="text-white font-mono">
-                ₹{userMonthlySalary.toLocaleString("en-IN")}/mo
-              </strong>
-              . Use the integrated tools to plan allocations.
-            </>
-          )}
-        </p>
-      </div>
+
 
       {/* Beautiful Modal Article Reader */}
       {selectedArticle && (() => {
