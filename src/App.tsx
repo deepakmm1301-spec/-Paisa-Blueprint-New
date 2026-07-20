@@ -8,7 +8,6 @@ import SIPCalculator from "./components/SIPCalculator";
 import RetirementPlanner from "./components/RetirementPlanner";
 import AICoach from "./components/AICoach";
 import ArticlesColumn from "./components/ArticlesColumn";
-import MarketInsights from "./components/MarketInsights";
 import PensionCalculator from "./components/PensionCalculator";
 import { FooterSections } from "./components/FooterSections";
 import SeoHub from "./components/SeoHub";
