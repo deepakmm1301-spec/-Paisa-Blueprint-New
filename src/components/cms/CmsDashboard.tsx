@@ -5,6 +5,7 @@ import {
   Plus, Trash2, Edit2, Check, RefreshCw, Eye, ArrowUp, ArrowDown,
   Upload, Sparkles, Shield, User, Copy, FilePlus, Search, ExternalLink, Filter
 } from "lucide-react";
+import ManageTeachers from "./ManageTeachers";
 
 interface CmsDashboardProps {
   language?: "en" | "hi";
@@ -204,8 +205,11 @@ export default function CmsDashboard({ language = "hi", userRole = "admin", onCl
     );
   }
 
+  const isSuperAdmin = userRole === "super_admin" || userRole === "super admin";
+
   const tabs = [
     { id: "homepage", label: "Homepage Manager", icon: <Layout className="w-4 h-4" /> },
+    ...(isSuperAdmin ? [{ id: "teachers", label: "Manage Teachers", icon: <User className="w-4 h-4" /> }] : []),
     { id: "announcements", label: "Announcements Board", icon: <Megaphone className="w-4 h-4" /> },
     { id: "circulars", label: "Govt Circulars", icon: <FileText className="w-4 h-4" /> },
     { id: "blogs", label: "Blog Manager", icon: <Sparkles className="w-4 h-4" /> },
@@ -293,6 +297,10 @@ export default function CmsDashboard({ language = "hi", userRole = "admin", onCl
         </div>
 
         {/* Render Tab Contents */}
+        {activeTab === "teachers" && (
+          <ManageTeachers language={language} userRole={userRole} />
+        )}
+
         {activeTab === "homepage" && cmsData && (
           <div className="space-y-6">
             <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-3xs space-y-4">

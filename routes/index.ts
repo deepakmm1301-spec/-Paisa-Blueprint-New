@@ -114,6 +114,12 @@ router.post("/visitors/hit", visitorController.hitVisitor);
 router.get("/teacher-hub/data", teacherHubController.getData);
 router.post("/teacher-hub/save", teacherHubController.saveData);
 
+// Administrative Teacher Hub Management (restricted to super_admin/admin via controller checks, authenticated via requireAdmin)
+router.put("/admin/teachers/:id", authController.requireAdmin, teacherHubController.adminUpdateTeacher);
+router.delete("/admin/teachers/:id", authController.requireAdmin, teacherHubController.adminDeleteTeacher);
+router.post("/admin/teachers/bulk-delete", authController.requireAdmin, teacherHubController.adminBulkDelete);
+router.post("/admin/teachers/bulk-verify", authController.requireAdmin, teacherHubController.adminBulkVerify);
+
 // AI Advisor chat endpoints (Heavy rate limiter applied to safeguard Gemini usage)
 router.post("/chat", heavyLimiter, chatController.chat);
 router.get("/chat/status", chatController.getStatus);

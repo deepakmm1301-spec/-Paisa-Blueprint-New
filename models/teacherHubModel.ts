@@ -163,5 +163,28 @@ export const teacherHubModel = {
       logger.error(`[SUPABASE SAVE ERROR] Failed to save merged state to Supabase: ${err.message || err}.`);
       throw err;
     }
+  },
+
+  overwriteState: async (payload: any): Promise<boolean> => {
+    try {
+      logger.info("[SUPABASE OVERWRITE] Overwriting entire payload in 'teacher_hub_data' table...");
+      const { error } = await supabase
+        .from("teacher_hub_data")
+        .upsert({
+          id: "global_state",
+          payload,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      logger.info(`[SUPABASE OVERWRITE SUCCESS] Successfully committed clean database. Teachers: ${payload.teachers?.length}`);
+      return true;
+    } catch (err: any) {
+      logger.error(`[SUPABASE OVERWRITE ERROR] Failed to overwrite state: ${err.message || err}.`);
+      throw err;
+    }
   }
 };
