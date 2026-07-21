@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { globalTeacherStore } from "../teacher-hub/TeacherDataStore";
 import {
   Search, Eye, Edit2, Trash2, Check, RefreshCw, X, AlertCircle,
   Download, CheckCircle, ChevronLeft, ChevronRight, Filter, ShieldAlert, FileSpreadsheet
@@ -197,6 +198,14 @@ export default function ManageTeachers({ language = "hi", userRole = "admin" }: 
         showToast(language === "hi" ? "शिक्षक को सफलतापूर्वक हटा दिया गया है।" : "Teacher removed successfully along with all dependents.");
         setDeletingTeacher(null);
         setSelectedIds(prev => prev.filter(id => id !== teacherId));
+        
+        // Invalidate all caches and immediately refetch the teacher list from Supabase
+        try {
+          await globalTeacherStore.invalidateCacheAndRefetch();
+        } catch (storeErr) {
+          console.warn("Failed to invalidate global store cache after delete:", storeErr);
+        }
+
         await fetchTeachers();
       } else {
         throw new Error(data.message || "Failed to delete teacher.");
@@ -252,6 +261,14 @@ export default function ManageTeachers({ language = "hi", userRole = "admin" }: 
         showToast(language === "hi" ? `सफलतापूर्वक ${selectedIds.length} शिक्षकों को हटाया गया।` : `Successfully deleted ${selectedIds.length} teachers and cascade cleared their records.`);
         setSelectedIds([]);
         setBulkConfirmAction(null);
+        
+        // Invalidate all caches and immediately refetch the teacher list from Supabase
+        try {
+          await globalTeacherStore.invalidateCacheAndRefetch();
+        } catch (storeErr) {
+          console.warn("Failed to invalidate global store cache after bulk delete:", storeErr);
+        }
+
         await fetchTeachers();
       } else {
         throw new Error(data.message || "Failed to execute bulk deletion.");

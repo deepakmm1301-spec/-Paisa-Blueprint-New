@@ -552,52 +552,10 @@ export class TeacherDataStore {
         if (data && data.exists === false) {
           this.saveToStorage();
         } else if (data) {
-          // Robust client-side merge: never overwrite newly registered local profiles that aren't on the server yet
+          // Strictly load live teachers from Supabase with no cached or mock data blended in
           if (Array.isArray(data.teachers)) {
-            const serverTeachers = data.teachers;
-            console.log("[API RESPONSE COUNT] Received", serverTeachers.length, "teachers from server API.");
-            
-            // Build merged list starting with the server's registered teachers
-            const merged = [...serverTeachers];
-            let mergeCount = 0;
-            
-            // Add static mock teachers if not already present
-            for (const mock of BIHAR_MOCK_TEACHERS) {
-              const alreadyExists = merged.some(
-                m => m.id === mock.id || (m.mobile && mock.mobile && m.mobile === mock.mobile)
-              );
-              if (!alreadyExists) {
-                merged.push(mock);
-              }
-            }
-            
-            // Add other local records (e.g. newly registered genuine user records, or generated filler records)
-            for (const local of this.teachers) {
-              const isFillerOrMock = local.id.startsWith("t-gen-") || BIHAR_MOCK_TEACHERS.some(m => m.id === local.id);
-              if (isFillerOrMock) {
-                const alreadyExists = merged.some(
-                  m => m.id === local.id || (m.mobile && local.mobile && m.mobile === local.mobile)
-                );
-                if (!alreadyExists) {
-                  merged.push(local);
-                }
-              } else {
-                // Genuine user record or logged-in teacher
-                const isGenuineUserRecord = local.id.startsWith("t-reg-") || (this.currentLoggedInTeacher && this.currentLoggedInTeacher.id === local.id);
-                if (isGenuineUserRecord) {
-                  const alreadyExists = merged.some(
-                    m => m.id === local.id || (m.mobile && local.mobile && m.mobile === local.mobile)
-                  );
-                  if (!alreadyExists) {
-                    merged.unshift(local);
-                    mergeCount++;
-                  }
-                }
-              }
-            }
-            
-            this.teachers = merged;
-            console.log("[BROWSER CACHE MERGE COUNT] Merged local and server records. Local-only genuine retained:", mergeCount, ". Total local teachers in store after merge:", this.teachers.length);
+            this.teachers = data.teachers.filter(t => !t.isDeleted);
+            console.log("[LIVE DB LOAD] Loaded", this.teachers.length, "active live teachers from Supabase.");
           }
           
           if (Array.isArray(data.requests)) this.requests = data.requests;
@@ -630,6 +588,20 @@ export class TeacherDataStore {
     }
   }
 
+  public async invalidateCacheAndRefetch() {
+    console.log("[CACHE INVALIDATION] Purging all client-side cached teacher listings and refetching live data from Supabase...");
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("paisa_teacher_hub_teachers");
+      localStorage.removeItem("paisa_teacher_hub_requests");
+      localStorage.removeItem("paisa_teacher_hub_notifications");
+      // Keep logged-in session, unless it gets verified as deleted during the fetch
+    }
+    this.teachers = [];
+    this.requests = [];
+    this.notifications = [];
+    await this.syncWithServer();
+  }
+
   public subscribe(listener: () => void) {
     this.listeners.add(listener);
     return () => {
@@ -656,10 +628,10 @@ export class TeacherDataStore {
       try {
         this.teachers = JSON.parse(savedTeachers);
       } catch (e) {
-        this.teachers = [...BIHAR_MOCK_TEACHERS, ...generateRandomTeachers()];
+        this.teachers = [];
       }
     } else {
-      this.teachers = [...BIHAR_MOCK_TEACHERS, ...generateRandomTeachers()];
+      this.teachers = [];
       localStorage.setItem("paisa_teacher_hub_teachers", JSON.stringify(this.teachers));
     }
 
@@ -984,26 +956,60 @@ export class TeacherDataStore {
     }
   }
 
-  public rejectTeacher(teacherId: string) {
+  public async rejectTeacher(teacherId: string) {
     const index = this.teachers.findIndex(item => item.id === teacherId);
     if (index > -1) {
       const name = this.teachers[index].name;
       this.teachers.splice(index, 1);
       this.logAudit("Admin Office", `Rejected and purged fake profile of Teacher: ${name}`);
-      this.saveToStorage();
+      
+      // Invalidate caches
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("paisa_teacher_hub_teachers");
+      }
+      
+      // Save and sync
+      await this.syncWithServer();
     }
   }
 
-  public deleteTeacher(teacherId: string) {
-    const t = this.teachers.find(item => item.id === teacherId);
-    if (t) {
-      t.isDeleted = true;
-      t.deletedAt = new Date().toISOString();
-      t.status = "Hidden"; // Mark status as hidden when soft deleted
-      t.lastUpdatedAt = new Date().toISOString();
-      this.logAudit(t.name, `Soft-deleted mutual transfer listing ID: ${teacherId}. Listing is hidden but can be restored within 30 days.`);
-      this.saveToStorage();
+  public async deleteTeacher(teacherId: string) {
+    console.log(`[STORE DELETE] Permanently removing teacher ${teacherId} and cascading deletes...`);
+    
+    // Invalidate local caches
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("paisa_teacher_hub_teachers");
+      localStorage.removeItem("paisa_teacher_hub_requests");
+      localStorage.removeItem("paisa_teacher_hub_notifications");
     }
+
+    // Filter out from local memory
+    this.teachers = this.teachers.filter(t => t.id !== teacherId);
+    this.requests = this.requests.filter(r => r.fromTeacherId !== teacherId && r.toTeacherId !== teacherId);
+    this.notifications = this.notifications.filter(n => n.teacherId !== teacherId);
+
+    // Save strictly live state to the server (Supabase)
+    try {
+      const res = await fetch("/api/teacher-hub/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          teachers: this.teachers,
+          requests: this.requests,
+          notifications: this.notifications,
+          successStories: this.successStories,
+          auditLogs: this.auditLogs
+        })
+      });
+      if (!res.ok) {
+        console.warn("Failed to commit teacher deletion to server.");
+      }
+    } catch (err) {
+      console.warn("Error saving deletion state to server:", err);
+    }
+
+    // Immediately refetch cleanly from Supabase
+    await this.syncWithServer();
   }
 
   public restoreTeacher(teacherId: string) {
