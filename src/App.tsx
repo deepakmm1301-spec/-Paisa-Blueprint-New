@@ -24,6 +24,8 @@ import PersonalFinanceDashboard from "./components/PersonalFinanceDashboard";
 import UserDashboard from "./components/UserDashboard";
 import TeacherHub from "./components/teacher-hub/TeacherHub";
 import PetitionCenter from "./components/PetitionCenter";
+import { PollsHub } from "./components/polls/PollsHub";
+import { PollDetailPage } from "./components/polls/PollDetailPage";
 import AdminPortal from "./components/AdminPortal";
 import { authService } from "./services/AuthService";
 import { initGA, trackPageView } from "./utils/analytics";
@@ -122,6 +124,7 @@ type ActiveWidget =
   | "dashboard"
   | "admin_portal"
   | "petition_center"
+  | "polls"
   | "profiles"
   | "health" 
   | "salary" 
@@ -402,6 +405,16 @@ export default function App() {
     return savedId || "profile-main";
   });
 
+  const [pollSlug, setPollSlug] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      const path = window.location.pathname;
+      if (path.startsWith("/polls/") && path.length > 7) {
+        return path.replace(/^\/polls\//, "");
+      }
+    }
+    return null;
+  });
+
   const [activeWidget, setActiveWidget] = useState<ActiveWidget>(() => {
     if (typeof window !== "undefined") {
       // Prioritize recovery detection (even if root "/" has hash appended due to Supabase redirect fallback)
@@ -420,6 +433,7 @@ export default function App() {
         .replace(/\/index$/, "")
         .replace(/\.html$/, "")
         .toLowerCase();
+      if (cleanPath === "/polls" || cleanPath.startsWith("/polls/") || cleanPath === "/opinion-polls" || cleanPath === "/vote") return "polls";
       if (cleanPath === "/dashboard" || cleanPath === "/personal-finance-dashboard") return "dashboard";
       if (cleanPath === "/bpsc-teacher-salary-calculator" || cleanPath === "/bihar-teacher-salary-calculator") return "bpsc_salary";
       if (cleanPath === "/bihar-da-calculator" || cleanPath === "/da-calculator") return "bihar_da";
@@ -487,13 +501,14 @@ export default function App() {
         if (queryWidget === "8th_pay_date" || queryWidget === "8th-pay-date" || queryWidget === "eight-pay-date") queryWidget = "eight_pay_date";
         if (queryWidget === "8th_pay_teachers" || queryWidget === "8th-pay-teachers" || queryWidget === "eight-pay-teachers") queryWidget = "eight_pay_teachers";
         if (queryWidget === "student_pdf" || queryWidget === "student-pdf" || queryWidget === "pdf-toolkit") queryWidget = "student_pdf";
+        if (queryWidget === "polls" || queryWidget === "poll") queryWidget = "polls";
 
         const validWidgets = [
           "dashboard", "profiles", "salary", "pension", "health", "sip", "retirement",
           "goals", "tax", "networth", "cibil", "debt", "coach", "seohub", "learning",
           "eight_pay_calc", "eight_pay_fitment", "eight_pay_hike", "eight_pay_pension",
           "eight_pay_news", "eight_pay_fitment_info", "eight_pay_chart", "eight_pay_date", "eight_pay_teachers",
-          "about", "contact", "student_pdf", "petition_center", "teacher_hub", "admin_portal",
+          "about", "contact", "student_pdf", "petition_center", "teacher_hub", "polls", "admin_portal",
           "bpsc_salary", "bihar_da", "govt_sip", "nps_govt", "login", "signup", "forgot_password", "reset_password", "verify_email"
         ];
         if (validWidgets.includes(queryWidget)) {
@@ -554,6 +569,7 @@ export default function App() {
     if (widget === "admin_portal") return "/admin";
     if (widget === "petition_center") return "/petitions";
     if (widget === "teacher_hub") return "/teacher-hub";
+    if (widget === "polls") return pollSlug ? `/polls/${pollSlug}` : "/polls";
     return "/";
   }, []);
 
@@ -1253,6 +1269,13 @@ export default function App() {
         desc: language === "hi" ? "बिहार सरकारी कर्मचारियों के याचिका अभियान और हस्ताक्षर" : "State employee petitions, signing hub & campaigns",
         icon: <Scale className="w-5 h-5 text-emerald-500" />,
         color: "text-emerald-700 bg-emerald-50 border-emerald-100",
+      },
+      {
+        id: "polls" as ActiveWidget,
+        label: language === "hi" ? "जनमत सर्वे एवं वोटिंग" : "Opinion Polls & Voting",
+        desc: language === "hi" ? "सरकारी कर्मचारियों के लाइव पोल, राय और जनमत वोट" : "Live opinion polls, community votes & surveys",
+        icon: <Vote className="w-5 h-5 text-rose-500" />,
+        color: "text-rose-700 bg-rose-50 border-rose-100",
       }
     ];
 
@@ -1448,6 +1471,22 @@ export default function App() {
             >
               <Scale className="w-3.5 h-3.5 text-amber-100" />
               <span className="font-extrabold">{language === "hi" ? "याचिका पर हस्ताक्षर" : "Sign Petition"}</span>
+            </button>
+
+            {/* Live Opinion Polls & Voting button */}
+            <button
+              onClick={() => {
+                setActiveWidget("polls");
+                setPollSlug(null);
+                if (contentRef.current) {
+                  contentRef.current.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
+              className="px-3.5 py-2.5 bg-rose-600 hover:bg-rose-700 active:scale-[0.98] text-white font-extrabold rounded-full text-xs flex items-center gap-1.5 transition-all cursor-pointer border-0 shadow-3xs shrink-0 uppercase tracking-wider animate-blink-attention"
+              title="Live Opinion Polls & Direct Voting"
+            >
+              <Vote className="w-3.5 h-3.5 text-rose-100" />
+              <span className="font-extrabold">{language === "hi" ? "जनमत पोल" : "Opinion Polls"}</span>
             </button>
 
             {/* Global Language Toggle Selector */}
@@ -1739,8 +1778,8 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => {
-                  localStorage.setItem("paisa_petition_tab", "polls");
-                  setActiveWidget("petition_center");
+                  setActiveWidget("polls");
+                  setPollSlug(null);
                   if (contentRef.current) {
                     contentRef.current.scrollIntoView({ behavior: "smooth" });
                   }
@@ -2019,6 +2058,39 @@ export default function App() {
                       }
                     }}
                   />
+                )}
+
+                {activeWidget === "polls" && (
+                  pollSlug ? (
+                    <PollDetailPage
+                      slug={pollSlug}
+                      language={language}
+                      sessionUser={sessionUser}
+                      onNavigateToHub={() => {
+                        setPollSlug(null);
+                        window.history.pushState({}, "", "/polls");
+                      }}
+                      onNavigateToPoll={(s) => {
+                        setPollSlug(s);
+                        window.history.pushState({}, "", `/polls/${s}`);
+                      }}
+                    />
+                  ) : (
+                    <PollsHub
+                      language={language}
+                      sessionUser={sessionUser}
+                      onNavigateToPoll={(s) => {
+                        setPollSlug(s);
+                        window.history.pushState({}, "", `/polls/${s}`);
+                      }}
+                      onNavigateToWidget={(w) => {
+                        setActiveWidget(w as any);
+                        if (contentRef.current) {
+                          contentRef.current.scrollIntoView({ behavior: "smooth" });
+                        }
+                      }}
+                    />
+                  )
                 )}
 
                 {activeWidget === "admin_portal" && (

@@ -293,11 +293,21 @@ export class PollModel {
   }
 
   /**
-   * Get single poll by ID
+   * Get single poll by ID or Slug
    */
-  static async getPollById(id: string, userId?: string): Promise<PollRecord | null> {
+  static async getPollById(idOrSlug: string, userId?: string): Promise<PollRecord | null> {
     const list = await this.getAllPolls({ userId });
-    const match = list.find(p => p.id === id);
+    const match = list.find(p => {
+      if (p.id === idOrSlug) return true;
+      if ((p as any).slug === idOrSlug) return true;
+      const slugified = p.question
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .trim()
+        .replace(/\s+/g, "-")
+        .substring(0, 70);
+      return slugified === idOrSlug;
+    });
     return match || null;
   }
 
