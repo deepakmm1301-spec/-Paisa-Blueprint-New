@@ -190,7 +190,7 @@ export default function RegistrationWizard({
           name: formData.name,
           gender: "Male", // Default
           mobile: formData.mobile,
-          email: currentUser?.email || `${formData.name.toLowerCase().replace(/\s+/g, "")}@bihar.gov.in`,
+          email: currentUser?.email || `${(formData.name || "").toString().toLowerCase().replace(/\s+/g, "") || "teacher"}@bihar.gov.in`,
           photoUrl: "https://i.pravatar.cc/150?img=1",
           employeeId: "BPSC-" + Math.floor(Math.random() * 900000 + 100000),
           teacherType: formData.teacherType,

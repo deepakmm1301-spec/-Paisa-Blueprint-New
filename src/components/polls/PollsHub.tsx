@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { Poll } from "../../types/poll";
 import { PollCard } from "./PollCard";
+import { safeRenderText } from "../../utils/safeRender";
 import { getPollSlug, isPollActive, getPollStatusLabel } from "../../lib/pollUtils";
 
 interface PollsHubProps {
@@ -208,6 +209,10 @@ export const PollsHub: React.FC<PollsHubProps> = ({
   onNavigateToPoll,
   onNavigateToWidget
 }) => {
+  useEffect(() => {
+    console.log("[PollsHub MOUNT] PollsHub component mounted successfully");
+  }, []);
+
   const [polls, setPolls] = useState<Poll[]>(FALLBACK_SEED_POLLS);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -216,13 +221,15 @@ export const PollsHub: React.FC<PollsHubProps> = ({
   const fetchPolls = async () => {
     try {
       setLoading(true);
+      console.log("[PollsHub API FETCH START] Fetching /api/polls...");
       const res = await fetch("/api/polls");
       const data = await res.json();
+      console.log("[PollsHub API FETCH COMPLETE] Received response from /api/polls:", { success: data.success, count: data.polls?.length });
       if (data.success && Array.isArray(data.polls) && data.polls.length > 0) {
         setPolls(data.polls);
       }
     } catch (err) {
-      console.warn("[POLLS HUB] Fetch error, preserving robust seed data:", err);
+      console.warn("[PollsHub API FETCH ERROR] Fetch error, preserving robust seed data:", err);
     } finally {
       setLoading(false);
     }
@@ -294,6 +301,8 @@ export const PollsHub: React.FC<PollsHubProps> = ({
       window.dispatchEvent(new PopStateEvent("popstate"));
     }
   };
+
+  console.log("[PollsHub RENDER] Rendering PollsHub JSX with", polls.length, "polls");
 
   return (
     <div className="min-h-screen bg-slate-50/50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 py-8 px-4 sm:px-6 lg:px-8 space-y-10 animate-fade-in">
@@ -549,14 +558,14 @@ export const PollsHub: React.FC<PollsHubProps> = ({
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-[10px]">
                   <span className="px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 font-bold border border-amber-200">
-                    {tPoll.category}
+                    {safeRenderText(tPoll.category)}
                   </span>
                   <span className="text-slate-400 font-mono">
                     {tPoll.total_votes || 0} votes
                   </span>
                 </div>
                 <h4 className="text-sm font-black text-slate-900 dark:text-slate-100 line-clamp-2 leading-snug">
-                  {tPoll.question}
+                  {safeRenderText(tPoll.question)}
                 </h4>
               </div>
 

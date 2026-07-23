@@ -413,7 +413,7 @@ export default function DistrictAnalytics({
                                   <span>🏫</span> {language === "hi" ? "कक्षा श्रेणी" : "Class"}
                                 </td>
                                 <td className="py-2.5 text-right font-black text-slate-800">
-                                  {teacher.classCategory.replace("Primary ", "").replace("Middle ", "").replace("Secondary ", "").replace("Senior Secondary ", "")}
+                                  {(teacher.classCategory || "").toString().replace("Primary ", "").replace("Middle ", "").replace("Secondary ", "").replace("Senior Secondary ", "")}
                                 </td>
                               </tr>
                               <tr className="border-b border-slate-100">

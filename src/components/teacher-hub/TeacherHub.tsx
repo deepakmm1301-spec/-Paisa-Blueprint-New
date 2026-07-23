@@ -5,6 +5,7 @@ import SearchPage from "./SearchPage";
 import FAQSection from "./FAQSection";
 import { PollCard } from "../polls/PollCard";
 import { Poll } from "../../types/poll";
+import { safeRenderText } from "../../utils/safeRender";
 import { motion, AnimatePresence } from "motion/react";
 import { 
   Users, 
@@ -93,6 +94,7 @@ export default function TeacherHub({ language }: TeacherHubProps) {
 
   // Sync and subscription on mount
   useEffect(() => {
+    console.log("[TeacherHub MOUNT] TeacherHub component mounted successfully");
     globalTeacherStore.syncWithServer();
 
     const updateStats = () => {
@@ -376,6 +378,8 @@ export default function TeacherHub({ language }: TeacherHubProps) {
     setDiagnosticRunning(false);
   };
 
+  console.log("[TeacherHub RENDER] Rendering TeacherHub JSX, activeTab =", activeTab);
+
   return (
     <div className="w-full flex flex-col min-h-screen text-slate-800 bg-slate-50/50 pb-20">
       
@@ -598,14 +602,14 @@ export default function TeacherHub({ language }: TeacherHubProps) {
                                 </span>
                               )}
                               <span className="text-[9px] font-black uppercase bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full">
-                                {ann.targetAudience || (language === "hi" ? "सभी" : "ALL")}
+                                {safeRenderText(ann.targetAudience) || (language === "hi" ? "सभी" : "ALL")}
                               </span>
                             </div>
                             <h4 className="text-sm font-black text-slate-800 group-hover:text-teal-850 transition-colors line-clamp-2 leading-snug">
-                              {ann.title}
+                              {safeRenderText(ann.title)}
                             </h4>
                             <p className="text-xs text-slate-500 line-clamp-3 leading-relaxed">
-                              {ann.description}
+                              {safeRenderText(ann.description)}
                             </p>
                           </div>
                           

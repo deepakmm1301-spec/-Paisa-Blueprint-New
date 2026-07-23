@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Poll, PollOption } from "../../types/poll";
 import { PollLoginModal } from "./PollLoginModal";
+import { safeRenderText } from "../../utils/safeRender";
 
 interface PollCardProps {
   poll: Poll;
@@ -145,10 +146,10 @@ export const PollCard: React.FC<PollCardProps> = ({
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent" />
           <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white">
             <span className="px-2.5 py-0.5 rounded-full bg-rose-500/90 backdrop-blur-xs text-[10px] font-extrabold uppercase tracking-wider">
-              {poll.category}
+              {safeRenderText(poll.category)}
             </span>
             <span className="text-[10px] font-bold bg-slate-900/60 backdrop-blur-xs px-2.5 py-0.5 rounded-full">
-              {poll.target_audience}
+              {safeRenderText(poll.target_audience)}
             </span>
           </div>
         </div>
@@ -160,7 +161,7 @@ export const PollCard: React.FC<PollCardProps> = ({
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-0.5 rounded-full bg-rose-50 border border-rose-150 text-rose-700 text-[10px] font-extrabold uppercase tracking-wider">
-                {poll.category}
+                {safeRenderText(poll.category)}
               </span>
               {poll.featured && (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-[10px] font-bold border border-amber-200">
@@ -178,11 +179,11 @@ export const PollCard: React.FC<PollCardProps> = ({
         {/* Question & Description */}
         <div className="space-y-1.5">
           <h3 className={`font-black text-slate-900 leading-snug ${compact ? "text-base" : "text-lg"}`}>
-            {poll.question}
+            {safeRenderText(poll.question)}
           </h3>
           {poll.description && (
             <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
-              {poll.description}
+              {safeRenderText(poll.description)}
             </p>
           )}
         </div>
@@ -258,7 +259,7 @@ export const PollCard: React.FC<PollCardProps> = ({
                     )}
 
                     <span className={`text-xs font-bold leading-tight ${isSelected || isUserVoted ? "text-slate-900" : "text-slate-700"}`}>
-                      {option.option_text}
+                      {safeRenderText(option?.option_text || option)}
                     </span>
                   </div>
 

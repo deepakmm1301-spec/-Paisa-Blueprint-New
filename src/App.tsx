@@ -27,6 +27,7 @@ import PetitionCenter from "./components/PetitionCenter";
 import { PollsHub } from "./components/polls/PollsHub";
 import { PollDetailPage } from "./components/polls/PollDetailPage";
 import AdminPortal from "./components/AdminPortal";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { authService } from "./services/AuthService";
 import { initGA, trackPageView } from "./utils/analytics";
 import { 
@@ -780,6 +781,8 @@ export default function App() {
           .replace(/\/index$/, "")
           .replace(/\.html$/, "")
           .toLowerCase();
+        if (cleanPath === "/polls" || cleanPath.startsWith("/polls/") || cleanPath === "/opinion-polls" || cleanPath === "/vote") return "polls";
+        if (cleanPath === "/dashboard" || cleanPath === "/personal-finance-dashboard") return "dashboard";
         if (cleanPath === "/bpsc-teacher-salary-calculator" || cleanPath === "/bihar-teacher-salary-calculator") return "bpsc_salary";
         if (cleanPath === "/bihar-da-calculator" || cleanPath === "/da-calculator") return "bihar_da";
         if (cleanPath === "/government-employee-sip-calculator") return "govt_sip";
@@ -823,7 +826,13 @@ export default function App() {
         return "bpsc_salary";
       };
 
-      setActiveWidget(getWidgetFromPath(window.location.pathname));
+      const path = window.location.pathname;
+      if (path.startsWith("/polls/") && path.length > 7) {
+        setPollSlug(path.replace(/^\/polls\//, ""));
+      } else if (path === "/polls" || path === "/opinion-polls" || path === "/vote") {
+        setPollSlug(null);
+      }
+      setActiveWidget(getWidgetFromPath(path));
     };
 
     window.addEventListener("popstate", handlePopState);
@@ -2044,45 +2053,16 @@ export default function App() {
                 )}
 
                 {activeWidget === "teacher_hub" && (
-                  <TeacherHub language={language} />
+                  <ErrorBoundary fallbackTitle="Error Loading Mutual Transfer Portal">
+                    <TeacherHub language={language} />
+                  </ErrorBoundary>
                 )}
 
                 {activeWidget === "petition_center" && (
-                  <PetitionCenter 
-                    language={language} 
-                    sessionUser={sessionUser} 
-                    onNavigateToWidget={(w) => {
-                      setActiveWidget(w as any);
-                      if (contentRef.current) {
-                        contentRef.current.scrollIntoView({ behavior: "smooth" });
-                      }
-                    }}
-                  />
-                )}
-
-                {activeWidget === "polls" && (
-                  pollSlug ? (
-                    <PollDetailPage
-                      slug={pollSlug}
-                      language={language}
-                      sessionUser={sessionUser}
-                      onNavigateToHub={() => {
-                        setPollSlug(null);
-                        window.history.pushState({}, "", "/polls");
-                      }}
-                      onNavigateToPoll={(s) => {
-                        setPollSlug(s);
-                        window.history.pushState({}, "", `/polls/${s}`);
-                      }}
-                    />
-                  ) : (
-                    <PollsHub
-                      language={language}
-                      sessionUser={sessionUser}
-                      onNavigateToPoll={(s) => {
-                        setPollSlug(s);
-                        window.history.pushState({}, "", `/polls/${s}`);
-                      }}
+                  <ErrorBoundary fallbackTitle="Error Loading Petition Center">
+                    <PetitionCenter 
+                      language={language} 
+                      sessionUser={sessionUser} 
                       onNavigateToWidget={(w) => {
                         setActiveWidget(w as any);
                         if (contentRef.current) {
@@ -2090,7 +2070,42 @@ export default function App() {
                         }
                       }}
                     />
-                  )
+                  </ErrorBoundary>
+                )}
+
+                {activeWidget === "polls" && (
+                  <ErrorBoundary fallbackTitle="Error Loading Opinion Polls">
+                    {pollSlug ? (
+                      <PollDetailPage
+                        slug={pollSlug}
+                        language={language}
+                        sessionUser={sessionUser}
+                        onNavigateToHub={() => {
+                          setPollSlug(null);
+                          window.history.pushState({}, "", "/polls");
+                        }}
+                        onNavigateToPoll={(s) => {
+                          setPollSlug(s);
+                          window.history.pushState({}, "", `/polls/${s}`);
+                        }}
+                      />
+                    ) : (
+                      <PollsHub
+                        language={language}
+                        sessionUser={sessionUser}
+                        onNavigateToPoll={(s) => {
+                          setPollSlug(s);
+                          window.history.pushState({}, "", `/polls/${s}`);
+                        }}
+                        onNavigateToWidget={(w) => {
+                          setActiveWidget(w as any);
+                          if (contentRef.current) {
+                            contentRef.current.scrollIntoView({ behavior: "smooth" });
+                          }
+                        }}
+                      />
+                    )}
+                  </ErrorBoundary>
                 )}
 
                 {activeWidget === "admin_portal" && (

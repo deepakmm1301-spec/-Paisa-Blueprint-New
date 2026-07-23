@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { Poll, PollOption } from "../../types/poll";
 import { PollLoginModal } from "./PollLoginModal";
+import { safeRenderText } from "../../utils/safeRender";
 import { getPollSlug, isPollActive, getPollStatusLabel } from "../../lib/pollUtils";
 
 interface PollDetailPageProps {
@@ -171,6 +172,10 @@ export const PollDetailPage: React.FC<PollDetailPageProps> = ({
   onNavigateToHub,
   onNavigateToPoll
 }) => {
+  useEffect(() => {
+    console.log("[PollDetailPage MOUNT] Mounted for slug:", slug);
+  }, [slug]);
+
   const [poll, setPoll] = useState<Poll | null>(null);
   const [allPolls, setAllPolls] = useState<Poll[]>(FALLBACK_SEED_POLLS);
   const [loading, setLoading] = useState(true);
@@ -188,9 +193,11 @@ export const PollDetailPage: React.FC<PollDetailPageProps> = ({
       try {
         setLoading(true);
         setErrorMsg(null);
+        console.log("[PollDetailPage API FETCH START] Loading poll by slug:", slug);
         const emailParam = sessionUser?.email ? `?userId=${encodeURIComponent(sessionUser.email)}` : "";
         const res = await fetch(`/api/polls/${encodeURIComponent(slug)}${emailParam}`);
         const data = await res.json();
+        console.log("[PollDetailPage API FETCH COMPLETE] Response for slug:", slug, { success: data.success, found: Boolean(data.poll) });
 
         if (data.success && data.poll) {
           setPoll(data.poll);
@@ -209,7 +216,7 @@ export const PollDetailPage: React.FC<PollDetailPageProps> = ({
           setAllPolls(dataList.polls);
         }
       } catch (err) {
-        console.warn("[POLL DETAIL] Fetch error, using high-fidelity local match:", err);
+        console.warn("[PollDetailPage API FETCH ERROR] Fetch error, using high-fidelity local match:", err);
         const localMatch = FALLBACK_SEED_POLLS.find(p => p.id === slug || getPollSlug(p) === slug) || FALLBACK_SEED_POLLS[0];
         setPoll(localMatch);
       } finally {
@@ -318,6 +325,7 @@ export const PollDetailPage: React.FC<PollDetailPageProps> = ({
   };
 
   if (loading) {
+    console.log("[PollDetailPage RETURN] Returning loading spinner JSX");
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
         <div className="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" />
@@ -327,6 +335,7 @@ export const PollDetailPage: React.FC<PollDetailPageProps> = ({
   }
 
   if (!poll) {
+    console.log("[PollDetailPage RETURN] Returning Poll Not Found JSX");
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center space-y-4">
         <AlertCircle className="w-12 h-12 text-rose-500 mx-auto" />
@@ -343,6 +352,8 @@ export const PollDetailPage: React.FC<PollDetailPageProps> = ({
   }
 
   const statusBadge = getPollStatusLabel(poll, language === "en" ? "en" : "hi");
+
+  console.log("[PollDetailPage RETURN] Rendering full poll detail JSX for question:", poll.question);
 
   return (
     <div className="min-h-screen bg-slate-50/50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 py-8 px-4 sm:px-6 lg:px-8 space-y-8 animate-fade-in">
@@ -381,10 +392,10 @@ export const PollDetailPage: React.FC<PollDetailPageProps> = ({
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent" />
             <div className="absolute bottom-4 left-6 right-6 flex items-center justify-between text-white">
               <span className="px-3 py-1 rounded-full bg-amber-500 text-amber-950 text-xs font-black uppercase tracking-wider">
-                {poll.category}
+                {safeRenderText(poll.category)}
               </span>
               <span className="text-xs font-bold bg-slate-900/80 backdrop-blur-md px-3 py-1 rounded-full">
-                Target: {poll.target_audience}
+                Target: {safeRenderText(poll.target_audience)}
               </span>
             </div>
           </div>
@@ -395,7 +406,7 @@ export const PollDetailPage: React.FC<PollDetailPageProps> = ({
           {!poll.image_url && (
             <div className="flex items-center gap-2">
               <span className="px-3 py-1 rounded-full bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 text-xs font-black uppercase tracking-wider border border-rose-200 dark:border-rose-800">
-                {poll.category}
+                {safeRenderText(poll.category)}
               </span>
               {poll.featured && (
                 <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 text-xs font-bold border border-amber-200 dark:border-amber-800">
@@ -409,11 +420,11 @@ export const PollDetailPage: React.FC<PollDetailPageProps> = ({
           {/* QUESTION AND DESCRIPTION */}
           <div className="space-y-3">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 dark:text-slate-100 leading-snug">
-              {poll.question}
+              {safeRenderText(poll.question)}
             </h1>
             {poll.description && (
               <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-3xl">
-                {poll.description}
+                {safeRenderText(poll.description)}
               </p>
             )}
           </div>
@@ -527,7 +538,7 @@ export const PollDetailPage: React.FC<PollDetailPageProps> = ({
                         )}
 
                         <span className={`text-sm sm:text-base font-bold leading-snug ${isSelected || isUserVoted ? "text-slate-900 dark:text-slate-100" : "text-slate-700 dark:text-slate-300"}`}>
-                          {option.option_text}
+                          {safeRenderText(option?.option_text || option)}
                         </span>
                       </div>
 

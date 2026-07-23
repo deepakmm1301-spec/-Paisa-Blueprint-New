@@ -317,7 +317,7 @@ export default function SearchPage({
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {displayedTeachers.map((teacher) => {
-              const cleanedMobile = teacher.mobile.replace(/\D/g, "");
+              const cleanedMobile = (teacher.mobile || "").toString().replace(/\D/g, "");
               const callHref = `tel:${cleanedMobile}`;
               
               const whatsappText = language === "hi"
