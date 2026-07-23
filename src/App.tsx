@@ -80,7 +80,8 @@ import {
   LogOut,
   UserPlus,
   Clock,
-  Megaphone
+  Megaphone,
+  Vote
 } from "lucide-react";
 
 // Default profile setup
@@ -1736,16 +1737,16 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => {
-                  setActiveWidget("learning");
+                  setActiveWidget("petition_center");
                   if (contentRef.current) {
                     contentRef.current.scrollIntoView({ behavior: "smooth" });
                   }
                 }}
-                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 active:scale-95 text-white text-sm sm:text-base font-black px-5 py-2.5 sm:px-6 sm:py-3 rounded-2xl shadow-lg border-0 cursor-pointer transition-all flex items-center gap-2"
+                className="bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-500 hover:to-yellow-500 active:scale-95 text-amber-950 text-base sm:text-lg font-black px-5 py-2.5 sm:px-6 sm:py-3 rounded-2xl shadow-lg shadow-amber-500/30 border border-amber-300/80 cursor-pointer transition-all flex items-center gap-2 tracking-wide"
               >
-                <IndianRupee className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-100" />
-                <span className="font-extrabold tracking-wide" style={{ wordSpacing: "0.25em" }}>पैसे से पैसा बनाना सीखो</span>
-                <ChevronRight className="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5 text-emerald-300" />
+                <Vote className="w-5 h-5 sm:w-6 sm:h-6 text-amber-950 shrink-0" />
+                <span className="font-black uppercase tracking-wider">{language === "hi" ? "अधिकारों के लिए वोट करें" : "VOTE FOR YOUR RIGHTS"}</span>
+                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-amber-950 shrink-0" />
               </button>
             </h2>
           </div>
