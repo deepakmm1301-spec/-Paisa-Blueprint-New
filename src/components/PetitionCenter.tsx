@@ -297,7 +297,7 @@ export default function PetitionCenter({ language = "hi", sessionUser, onNavigat
   const progressPercent = Math.min(Math.round((currentSigs / goal) * 100), 100);
 
   return (
-    <div className="min-h-screen bg-slate-50/50 text-slate-900 py-8 px-4 sm:px-6 lg:px-8 space-y-8 animate-fade-in">
+    <div id="petitions" className="min-h-screen bg-slate-50/50 text-slate-900 py-8 px-4 sm:px-6 lg:px-8 space-y-8 animate-fade-in">
       {/* 1. Header Banner */}
       <div className="bg-gradient-to-br from-amber-500 via-amber-600 to-yellow-600 rounded-3xl p-6 md:p-10 text-amber-950 shadow-xl relative overflow-hidden border border-amber-400/40">
         <div className="absolute -right-10 -top-10 w-64 h-64 bg-white/10 rounded-full blur-2xl pointer-events-none" />

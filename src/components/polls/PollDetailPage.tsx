@@ -358,7 +358,7 @@ export const PollDetailPage: React.FC<PollDetailPageProps> = ({
   console.log("[PollDetailPage RETURN] Rendering full poll detail JSX for question:", poll.question);
 
   return (
-    <div className="min-h-screen bg-slate-50/50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 py-8 px-4 sm:px-6 lg:px-8 space-y-8 animate-fade-in">
+    <div id="polls" className="min-h-screen bg-slate-50/50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 py-8 px-4 sm:px-6 lg:px-8 space-y-8 animate-fade-in">
       {/* TOP NAVIGATION BACK BUTTON */}
       <div className="flex items-center justify-between">
         <button

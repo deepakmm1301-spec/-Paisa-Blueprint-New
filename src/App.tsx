@@ -848,7 +848,32 @@ export default function App() {
         if (cleanPath === "/reset-password") return "reset_password";
         if (cleanPath === "/verify-email") return "verify_email";
 
-        if (cleanPath === "") return "bpsc_salary";
+        if (cleanPath === "") {
+          if (typeof window !== "undefined") {
+            const hash = (window.location.hash || "").toLowerCase();
+            if (hash.includes("sip")) return "sip";
+            if (hash.includes("nps")) return "nps_govt";
+            if (hash.includes("da")) return "bihar_da";
+            if (hash.includes("bpsc")) return "bpsc_salary";
+            if (hash.includes("8th-pay") || hash.includes("pay-commission")) return "eight_pay_calc";
+            if (hash.includes("pension")) return "pension";
+            if (hash.includes("salary")) return "salary";
+            if (hash.includes("petition")) return "petition_center";
+            if (hash.includes("teacher") || hash.includes("transfer")) return "teacher_hub";
+            if (hash.includes("poll")) return "polls";
+            if (hash.includes("pdf") || hash.includes("student")) return "student_pdf";
+            if (hash.includes("health")) return "health";
+            if (hash.includes("retirement")) return "retirement";
+            if (hash.includes("goal")) return "goals";
+            if (hash.includes("tax")) return "tax";
+            if (hash.includes("wealth") || hash.includes("networth")) return "networth";
+            if (hash.includes("cibil") || hash.includes("credit")) return "cibil";
+            if (hash.includes("debt")) return "debt";
+            if (hash.includes("coach") || hash.includes("ai")) return "coach";
+            if (hash.includes("article") || hash.includes("cabinet")) return "seohub";
+          }
+          return "bpsc_salary";
+        }
         return "bpsc_salary";
       };
 
@@ -994,51 +1019,100 @@ export default function App() {
   // Deriving the active profile based on selection
   const profile = profiles.find(p => p.id === activeProfileId) || profiles[0] || { ...defaultProfile, id: "profile-main" };
 
-  // Automatic deep link scroll & navigation handler across full platform
+  // Robust DOM MutationObserver based deep link scroll trigger
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const performScroll = () => {
+    let observer: MutationObserver | null = null;
+    let scrolled = false;
+
+    const performHashScroll = () => {
       const rawHash = window.location.hash;
-      if (rawHash && rawHash.length > 1) {
-        const cleanHash = rawHash.replace(/^#/, "");
-        if (cleanHash) {
-          let attempts = 0;
-          const interval = setInterval(() => {
-            attempts++;
-            const el = document.getElementById(cleanHash) ||
-                       document.getElementById(`${cleanHash}-module`) ||
-                       document.getElementById(`${cleanHash}-section`) ||
-                       document.querySelector(`[data-section="${cleanHash}"]`) ||
-                       document.querySelector(`a[name="${cleanHash}"]`);
-            if (el) {
-              clearInterval(interval);
-              el.scrollIntoView({ behavior: "smooth", block: "start" });
-            } else if (attempts > 20) {
-              clearInterval(interval);
-              if (contentRef.current) {
-                contentRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-              }
-            }
-          }, 80);
-          return;
+      if (!rawHash || rawHash.length <= 1) {
+        if (!isFirstMount.current || (window.location.pathname !== "/" && window.location.pathname !== "")) {
+          if (contentRef.current) {
+            contentRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
         }
+        isFirstMount.current = false;
+        return;
       }
 
-      if (!isFirstMount.current || (window.location.pathname !== "/" && window.location.pathname !== "")) {
-        if (contentRef.current) {
-          contentRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      const targetId = rawHash.replace(/^#/, "").trim();
+      if (!targetId) return;
+
+      const attemptScroll = (): boolean => {
+        const el = document.getElementById(targetId) ||
+                   document.getElementById(`${targetId}-module`) ||
+                   document.getElementById(`${targetId}-section`) ||
+                   document.querySelector(`[data-section="${targetId}"]`) ||
+                   document.querySelector(`a[name="${targetId}"]`);
+
+        if (el && !scrolled) {
+          scrolled = true;
+          requestAnimationFrame(() => {
+            el.scrollIntoView({
+              behavior: "smooth",
+              block: "start"
+            });
+          });
+          return true;
         }
+        return false;
+      };
+
+      // 6. If the element already exists, scroll immediately
+      if (attemptScroll()) {
+        if (observer) {
+          observer.disconnect();
+          observer = null;
+        }
+        isFirstMount.current = false;
+        return;
       }
+
+      // 3. Use MutationObserver to wait until element appears (e.g. React complete render or lazy components)
+      if (observer) {
+        observer.disconnect();
+      }
+
+      observer = new MutationObserver(() => {
+        if (attemptScroll()) {
+          // 5. Disconnect observer immediately after scrolling
+          if (observer) {
+            observer.disconnect();
+            observer = null;
+          }
+        }
+      });
+
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true
+      });
+
       isFirstMount.current = false;
     };
 
-    const timer = setTimeout(performScroll, 120);
+    // 1 & 2. Execute on mount and active route changes after React render settlement
+    performHashScroll();
 
-    window.addEventListener("hashchange", performScroll);
+    const handleLocationChange = () => {
+      scrolled = false;
+      performHashScroll();
+    };
+
+    window.addEventListener("hashchange", handleLocationChange);
+    window.addEventListener("popstate", handleLocationChange);
+
     return () => {
-      clearTimeout(timer);
-      window.removeEventListener("hashchange", performScroll);
+      if (observer) {
+        observer.disconnect();
+        observer = null;
+      }
+      window.removeEventListener("hashchange", handleLocationChange);
+      window.removeEventListener("popstate", handleLocationChange);
     };
   }, [activeWidget, pollSlug]);
 

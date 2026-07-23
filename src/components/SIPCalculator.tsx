@@ -309,7 +309,7 @@ Calculate your compounding potential instantly:`;
   };
 
   return (
-    <div id="sip-calculator-module" className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6 md:p-8 shadow-xs">
+    <div id="sip-calculator" className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6 md:p-8 shadow-xs">
       {/* Header Banner */}
       <div className="border-b border-slate-100 dark:border-slate-800 pb-5 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

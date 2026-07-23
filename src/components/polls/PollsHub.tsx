@@ -305,7 +305,7 @@ export const PollsHub: React.FC<PollsHubProps> = ({
   console.log("[PollsHub RENDER] Rendering PollsHub JSX with", polls.length, "polls");
 
   return (
-    <div className="min-h-screen bg-slate-50/50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 py-8 px-4 sm:px-6 lg:px-8 space-y-10 animate-fade-in">
+    <div id="polls" className="min-h-screen bg-slate-50/50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 py-8 px-4 sm:px-6 lg:px-8 space-y-10 animate-fade-in">
       {/* HERO BANNER SECTION */}
       <div className="relative rounded-3xl bg-gradient-to-br from-amber-500 via-amber-600 to-yellow-600 p-6 sm:p-10 text-amber-950 shadow-2xl overflow-hidden border border-amber-400/40">
         {/* Background Decorative Rings */}

@@ -381,7 +381,7 @@ export default function TeacherHub({ language }: TeacherHubProps) {
   console.log("[TeacherHub RENDER] Rendering TeacherHub JSX, activeTab =", activeTab);
 
   return (
-    <div className="w-full flex flex-col min-h-screen text-slate-800 bg-slate-50/50 pb-20">
+    <div id="teacher-hub" className="w-full flex flex-col min-h-screen text-slate-800 bg-slate-50/50 pb-20">
       
       {/* 1. TOP PREMIUM HEADER WITH TOP NAVIGATION */}
       <header id="teacher-hub-header" className="bg-white border-b border-slate-100/80 sticky top-0 z-40 shadow-xs px-4 py-4.5 sm:px-6">
