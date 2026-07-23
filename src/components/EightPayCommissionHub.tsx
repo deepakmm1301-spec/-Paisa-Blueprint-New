@@ -298,7 +298,7 @@ export default function EightPayCommissionHub({ activeSubPage, onNavigate, langu
   };
 
   return (
-    <div className="bg-slate-50 dark:bg-slate-900 min-h-screen">
+    <div id="eight-pay-commission-calculator" className="bg-slate-50 dark:bg-slate-900 min-h-screen">
       {/* 8th Pay Banner Hub Header */}
       <div className="bg-gradient-to-r from-violet-600 to-indigo-700 text-white py-10 px-6 rounded-3xl shadow-lg mb-8 text-center relative overflow-hidden print:hidden">
         <div className="absolute top-0 right-0 p-8 opacity-10">

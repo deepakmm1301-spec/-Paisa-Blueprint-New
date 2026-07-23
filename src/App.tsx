@@ -1019,6 +1019,30 @@ export default function App() {
   // Deriving the active profile based on selection
   const profile = profiles.find(p => p.id === activeProfileId) || profiles[0] || { ...defaultProfile, id: "profile-main" };
 
+  // Target element IDs for direct deep-link scrolling across tools & calculators
+  const WIDGET_TARGET_ID_MAP: Record<string, string> = {
+    sip: "sip-calculator",
+    salary: "salary-calculator",
+    bpsc_salary: "bpsc-salary-calculator",
+    bihar_da: "da-calculator",
+    govt_sip: "govt-sip-calculator",
+    nps_govt: "nps-calculator",
+    teacher_hub: "teacher-hub",
+    petition_center: "petitions",
+    polls: "polls",
+    eight_pay_calc: "eight-pay-commission-calculator",
+    pension: "pension-calculator-section",
+    retirement: "retirement-planner-module",
+    goals: "goal-planner-module",
+    tax: "tax-planner-module",
+    networth: "networth-tracker-module",
+    cibil: "cibil-scorecard-section",
+    debt: "debt-repayment-planner-app",
+    coach: "ai-coach-module",
+    student_pdf: "student-pdf-toolkit",
+    health: "health-scorecard"
+  };
+
   // Robust DOM MutationObserver based deep link scroll trigger
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -1028,7 +1052,15 @@ export default function App() {
 
     const performHashScroll = () => {
       const rawHash = window.location.hash;
-      if (!rawHash || rawHash.length <= 1) {
+      let targetId = rawHash ? rawHash.replace(/^#/, "").trim() : "";
+
+      // If no hash in URL (e.g. shared pathname links like /sip-calculator, /teacher-hub, /polls, /petitions)
+      // fallback to the active widget's main calculator/tool element ID
+      if (!targetId && activeWidget && WIDGET_TARGET_ID_MAP[activeWidget]) {
+        targetId = WIDGET_TARGET_ID_MAP[activeWidget];
+      }
+
+      if (!targetId) {
         if (!isFirstMount.current || (window.location.pathname !== "/" && window.location.pathname !== "")) {
           if (contentRef.current) {
             contentRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1037,9 +1069,6 @@ export default function App() {
         isFirstMount.current = false;
         return;
       }
-
-      const targetId = rawHash.replace(/^#/, "").trim();
-      if (!targetId) return;
 
       const attemptScroll = (): boolean => {
         const el = document.getElementById(targetId) ||

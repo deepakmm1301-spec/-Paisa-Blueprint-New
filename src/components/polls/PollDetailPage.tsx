@@ -128,42 +128,6 @@ const FALLBACK_SEED_POLLS: Poll[] = [
         vote_count: 710
       }
     ]
-  },
-  {
-    id: "a3030303-3333-4444-8888-333333333333",
-    question: "Should Dearness Allowance (DA) merger into basic pay happen at 50% threshold?",
-    description: "Public opinion survey on the automatic merger proposal of DA with basic salary before the 8th Pay Commission formulation.",
-    category: "Announcements",
-    allow_multiple: false,
-    show_results_before_vote: true,
-    allow_vote_edit: false,
-    require_login: true,
-    featured: false,
-    status: "Published",
-    priority: "Medium",
-    target_audience: "Government Employees",
-    image_url: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&q=80&w=1200",
-    start_date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-    end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-    total_votes: 1980,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    options: [
-      {
-        id: "d1010101-1111-4444-8888-111111111111",
-        poll_id: "a3030303-3333-4444-8888-333333333333",
-        option_text: "Yes, Immediate Merger Required",
-        display_order: 1,
-        vote_count: 1540
-      },
-      {
-        id: "d2020202-2222-4444-8888-222222222222",
-        poll_id: "a3030303-3333-4444-8888-333333333333",
-        option_text: "No, Keep Separate DA Structure",
-        display_order: 2,
-        vote_count: 440
-      }
-    ]
   }
 ];
 
