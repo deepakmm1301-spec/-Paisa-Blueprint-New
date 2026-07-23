@@ -14,6 +14,7 @@ import {
 import { Poll, PollOption } from "../../types/poll";
 import { PollLoginModal } from "./PollLoginModal";
 import { safeRenderText } from "../../utils/safeRender";
+import { PollShareBar } from "./PollShareBar";
 
 interface PollCardProps {
   poll: Poll;
@@ -281,6 +282,11 @@ export const PollCard: React.FC<PollCardProps> = ({
               </div>
             );
           })}
+        </div>
+
+        {/* Share Poll Bar */}
+        <div className="pt-2">
+          <PollShareBar poll={poll} compact={compact} showTitle={!compact} />
         </div>
 
         {/* Bottom Actions & Stats Bar */}

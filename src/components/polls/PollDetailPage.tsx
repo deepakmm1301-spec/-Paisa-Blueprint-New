@@ -24,6 +24,7 @@ import { Poll, PollOption } from "../../types/poll";
 import { PollLoginModal } from "./PollLoginModal";
 import { safeRenderText } from "../../utils/safeRender";
 import { getPollSlug, isPollActive, getPollStatusLabel } from "../../lib/pollUtils";
+import { PollShareBar } from "./PollShareBar";
 
 interface PollDetailPageProps {
   slug: string;
@@ -614,45 +615,7 @@ export const PollDetailPage: React.FC<PollDetailPageProps> = ({
           </div>
 
           {/* SHARE BAR */}
-          <div className="bg-amber-50 dark:bg-amber-950/30 rounded-2xl p-4 border border-amber-200/80 dark:border-amber-800/60 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <Share2 className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-              <div>
-                <h4 className="text-sm font-black text-slate-900 dark:text-slate-100">
-                  {language === "hi" ? "इस जनमत सर्वेक्षण को साझा करें" : "Share This Opinion Poll"}
-                </h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {language === "hi" ? "अपने साथी शिक्षकों और कर्मचारियों को वोट करने के लिए आमंत्रित करें।" : "Amplify democratic engagement across WhatsApp groups and social networks."}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <button
-                onClick={handleCopyLink}
-                className="flex-1 sm:flex-none px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 hover:bg-slate-50 cursor-pointer"
-              >
-                {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copiedLink ? "Link Copied!" : "Copy Link"}</span>
-              </button>
-
-              <button
-                onClick={handleWhatsAppShare}
-                className="flex-1 sm:flex-none px-3.5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
-              >
-                <MessageCircle className="w-3.5 h-3.5" />
-                <span>WhatsApp</span>
-              </button>
-
-              <button
-                onClick={handleTwitterShare}
-                className="flex-1 sm:flex-none px-3.5 py-2 bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
-              >
-                <Twitter className="w-3.5 h-3.5" />
-                <span>X / Twitter</span>
-              </button>
-            </div>
-          </div>
+          <PollShareBar poll={poll} language={language} className="mt-4" />
         </div>
       </div>
 

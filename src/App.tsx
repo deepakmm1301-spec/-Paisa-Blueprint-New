@@ -412,6 +412,9 @@ export default function App() {
       if (path.startsWith("/polls/") && path.length > 7) {
         return path.replace(/^\/polls\//, "");
       }
+      const params = new URLSearchParams(window.location.search);
+      const qPoll = params.get("poll") || params.get("pollId") || params.get("slug") || params.get("p");
+      if (qPoll) return qPoll;
     }
     return null;
   });
@@ -827,12 +830,20 @@ export default function App() {
       };
 
       const path = window.location.pathname;
+      const qPoll = params.get("poll") || params.get("pollId") || params.get("slug") || params.get("p");
+
       if (path.startsWith("/polls/") && path.length > 7) {
         setPollSlug(path.replace(/^\/polls\//, ""));
+      } else if (qPoll) {
+        setPollSlug(qPoll);
       } else if (path === "/polls" || path === "/opinion-polls" || path === "/vote") {
         setPollSlug(null);
       }
-      setActiveWidget(getWidgetFromPath(path));
+      if (qPoll || path.startsWith("/polls/")) {
+        setActiveWidget("polls");
+      } else {
+        setActiveWidget(getWidgetFromPath(path));
+      }
     };
 
     window.addEventListener("popstate", handlePopState);

@@ -188,7 +188,7 @@ export default function PetitionCenter({ language = "hi", sessionUser, onNavigat
 
   const handleSignSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.district || !formData.school || !formData.teacherCategory || !formData.consent) {
+    if (!formData.district || !formData.teacherCategory || !formData.consent) {
       setError("Please fill in all required verification fields and consent checkbox.");
       return;
     }
@@ -656,13 +656,14 @@ export default function PetitionCenter({ language = "hi", sessionUser, onNavigat
                     </div>
 
                     <div>
-                      <label className="block text-slate-700 font-bold mb-1">School Name (विद्यालय का नाम)</label>
+                      <label className="block text-slate-700 font-bold mb-1">
+                        School Name (विद्यालय का नाम) <span className="text-slate-400 font-normal text-xs">(Optional / ऐच्छिक)</span>
+                      </label>
                       <input 
                         type="text" 
-                        required
                         value={formData.school}
                         onChange={(e) => setFormData({ ...formData, school: e.target.value })}
-                        placeholder="e.g. UMS Kanti, Muzaffarpur"
+                        placeholder="e.g. UMS Kanti, Muzaffarpur (Optional)"
                         className="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-amber-500/50 focus:outline-none"
                       />
                     </div>
