@@ -293,3 +293,129 @@ INSERT INTO public.petition_documents (
   'pdf'
 )
 ON CONFLICT (id) DO NOTHING;
+
+
+-- -------------------------------------------------------------
+-- SECTION D: POLL MANAGEMENT SYSTEM TABLES
+-- -------------------------------------------------------------
+
+-- 14. Create polls table
+CREATE TABLE IF NOT EXISTS public.polls (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  question TEXT NOT NULL,
+  description TEXT,
+  category TEXT DEFAULT 'General',
+  allow_multiple BOOLEAN DEFAULT false,
+  show_results_before_vote BOOLEAN DEFAULT false,
+  allow_vote_edit BOOLEAN DEFAULT true,
+  require_login BOOLEAN DEFAULT true,
+  featured BOOLEAN DEFAULT false,
+  status TEXT DEFAULT 'Published',
+  priority TEXT DEFAULT 'Medium',
+  target_audience TEXT DEFAULT 'Everyone',
+  image_url TEXT,
+  start_date TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
+  end_date TIMESTAMP WITH TIME ZONE,
+  total_votes INT DEFAULT 0,
+  created_by TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+);
+
+CREATE INDEX IF NOT EXISTS idx_polls_category ON public.polls(category);
+CREATE INDEX IF NOT EXISTS idx_polls_status ON public.polls(status);
+CREATE INDEX IF NOT EXISTS idx_polls_featured ON public.polls(featured);
+
+-- 15. Create poll_options table
+CREATE TABLE IF NOT EXISTS public.poll_options (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  poll_id UUID NOT NULL REFERENCES public.polls(id) ON DELETE CASCADE,
+  option_text TEXT NOT NULL,
+  display_order INT DEFAULT 0,
+  vote_count INT DEFAULT 0
+);
+
+CREATE INDEX IF NOT EXISTS idx_poll_options_poll_id ON public.poll_options(poll_id);
+
+-- 16. Create poll_votes table
+CREATE TABLE IF NOT EXISTS public.poll_votes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  poll_id UUID NOT NULL REFERENCES public.polls(id) ON DELETE CASCADE,
+  option_id UUID NOT NULL REFERENCES public.poll_options(id) ON DELETE CASCADE,
+  user_id TEXT NOT NULL,
+  voted_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+);
+
+-- Unique constraint preventing duplicate vote for the same option by the same user
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'unique_poll_option_user_vote'
+    ) THEN
+        ALTER TABLE public.poll_votes ADD CONSTRAINT unique_poll_option_user_vote UNIQUE (poll_id, option_id, user_id);
+    END IF;
+END $$;
+
+CREATE INDEX IF NOT EXISTS idx_poll_votes_poll_id ON public.poll_votes(poll_id);
+CREATE INDEX IF NOT EXISTS idx_poll_votes_user_id ON public.poll_votes(user_id);
+
+-- Seed Initial High-Priority Opinion Polls
+INSERT INTO public.polls (
+  id, question, description, category, allow_multiple, 
+  show_results_before_vote, allow_vote_edit, require_login, featured, 
+  status, priority, target_audience, image_url, start_date, end_date, total_votes
+) VALUES (
+  'a1010101-1111-4444-8888-111111111111'::uuid,
+  'Which Bihar BPSC Teacher Mutual Transfer Rule improvement is most critical?',
+  'Cast your official vote on the top structural policy reform needed for the 2026 Bihar Teacher Mutual Transfer schedule.',
+  'Teacher Hub',
+  true,
+  false,
+  true,
+  true,
+  true,
+  'Published',
+  'High',
+  'Teachers',
+  'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=800',
+  timezone('utc'::text, now()),
+  timezone('utc'::text, now() + interval '60 days'),
+  1420
+) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public.poll_options (id, poll_id, option_text, display_order, vote_count) VALUES
+  ('b1010101-1111-4444-8888-111111111111'::uuid, 'a1010101-1111-4444-8888-111111111111'::uuid, 'Instant Online Verification & Auto Match', 1, 620),
+  ('b2020202-2222-4444-8888-222222222222'::uuid, 'a1010101-1111-4444-8888-111111111111'::uuid, 'Home District Choice Preference', 2, 450),
+  ('b3030303-3333-4444-8888-333333333333'::uuid, 'a1010101-1111-4444-8888-333333333333'::uuid, 'Transparent Point-Based Seniority Ranks', 3, 230),
+  ('b4040404-4444-4444-8888-444444444444'::uuid, 'a1010101-1111-4444-8888-111111111111'::uuid, 'Special Consideration for Medical & Women Teachers', 4, 120)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public.polls (
+  id, question, description, category, allow_multiple, 
+  show_results_before_vote, allow_vote_edit, require_login, featured, 
+  status, priority, target_audience, image_url, start_date, end_date, total_votes
+) VALUES (
+  'a2020202-2222-4444-8888-222222222222'::uuid,
+  'What Fitment Factor do you support for the upcoming 8th Pay Commission?',
+  'Share your opinion on the projected salary scale fitment multiplier for central and state government employees.',
+  'Homepage',
+  false,
+  false,
+  true,
+  true,
+  true,
+  'Published',
+  'High',
+  'Government Employees',
+  'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=800',
+  timezone('utc'::text, now()),
+  timezone('utc'::text, now() + interval '90 days'),
+  2840
+) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO public.poll_options (id, poll_id, option_text, display_order, vote_count) VALUES
+  ('c1010101-1111-4444-8888-111111111111'::uuid, 'a2020202-2222-4444-8888-222222222222'::uuid, '2.57 Fitment Factor (Standard 7th CPC baseline)', 1, 410),
+  ('c2020202-2222-4444-8888-222222222222'::uuid, 'a2020202-2222-4444-8888-222222222222'::uuid, '2.86 Fitment Factor (Recommended Inflation Benchmark)', 2, 1720),
+  ('c3030303-3333-4444-8888-333333333333'::uuid, 'a2020202-2222-4444-8888-222222222222'::uuid, '3.00 Fitment Factor (Maximum Demand Benchmark)', 3, 710)
+ON CONFLICT (id) DO NOTHING;
+

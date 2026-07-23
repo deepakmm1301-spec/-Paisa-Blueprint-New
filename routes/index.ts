@@ -7,6 +7,7 @@ import { authController } from "../controllers/authController";
 import { lockerController } from "../controllers/lockerController";
 import { petitionController } from "../controllers/petitionController";
 import { cmsController } from "../controllers/cmsController";
+import { pollController } from "../controllers/pollController";
 import { apiLimiter, heavyLimiter } from "../middleware/rateLimiter";
 
 const router = Router();
@@ -49,6 +50,24 @@ router.delete("/auth/profile/delete", authController.requireAuth, authController
 router.post("/auth/update-profiles", authController.requireAuth, authController.updateProfilesList);
 router.post("/auth/update-profile", authController.requireAuth, authController.updateProfilesList);
 router.post("/auth/update-account-name", authController.requireAuth, authController.updateAccountName);
+
+// -------------------------------------------------------------
+// POLL MANAGEMENT SYSTEM ENDPOINTS
+// -------------------------------------------------------------
+router.get("/polls", pollController.getAllPolls);
+router.get("/polls/featured", pollController.getFeaturedPoll);
+router.get("/polls/analytics", requireCmsAccess, pollController.getAnalytics);
+router.get("/polls/:id", pollController.getPollById);
+
+// Voting requires authentication
+router.post("/polls/:id/vote", authController.requireAuth, pollController.castVote);
+
+// Poll Management CRUD (Restricted to CMS Admins/Moderators)
+router.post("/polls", requireCmsAccess, pollController.createPoll);
+router.put("/polls/:id", requireCmsAccess, pollController.updatePoll);
+router.post("/polls/:id/duplicate", requireCmsAccess, pollController.duplicatePoll);
+router.post("/polls/:id/archive", requireCmsAccess, pollController.archivePoll);
+router.delete("/polls/:id", requireCmsAccess, pollController.deletePoll);
 
 // -------------------------------------------------------------
 // PETITIONS & PUBLIC ENGAGEMENT ENDPOINTS

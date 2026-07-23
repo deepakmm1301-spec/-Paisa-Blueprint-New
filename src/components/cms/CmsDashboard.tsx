@@ -3,9 +3,10 @@ import {
   FileText, Megaphone, HelpCircle, Download, Image as ImageIcon,
   Layout, Menu, Navigation, Settings, History, Clipboard, AlertCircle,
   Plus, Trash2, Edit2, Check, RefreshCw, Eye, ArrowUp, ArrowDown,
-  Upload, Sparkles, Shield, User, Copy, FilePlus, Search, ExternalLink, Filter
+  Upload, Sparkles, Shield, User, Copy, FilePlus, Search, ExternalLink, Filter, Vote
 } from "lucide-react";
 import ManageTeachers from "./ManageTeachers";
+import PollManagement from "./PollManagement";
 
 interface CmsDashboardProps {
   language?: "en" | "hi";
@@ -209,6 +210,7 @@ export default function CmsDashboard({ language = "hi", userRole = "admin", onCl
 
   const tabs = [
     { id: "homepage", label: "Homepage Manager", icon: <Layout className="w-4 h-4" /> },
+    { id: "polls", label: "Poll Management", icon: <Vote className="w-4 h-4" /> },
     ...(isSuperAdmin ? [{ id: "teachers", label: "Manage Teachers", icon: <User className="w-4 h-4" /> }] : []),
     { id: "announcements", label: "Announcements Board", icon: <Megaphone className="w-4 h-4" /> },
     { id: "circulars", label: "Govt Circulars", icon: <FileText className="w-4 h-4" /> },
@@ -297,6 +299,10 @@ export default function CmsDashboard({ language = "hi", userRole = "admin", onCl
         </div>
 
         {/* Render Tab Contents */}
+        {activeTab === "polls" && (
+          <PollManagement language={language} userRole={userRole} />
+        )}
+
         {activeTab === "teachers" && (
           <ManageTeachers language={language} userRole={userRole} />
         )}

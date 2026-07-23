@@ -3,6 +3,8 @@ import { Teacher, globalTeacherStore } from "./TeacherDataStore";
 import RegistrationWizard from "./RegistrationWizard";
 import SearchPage from "./SearchPage";
 import FAQSection from "./FAQSection";
+import { PollCard } from "../polls/PollCard";
+import { Poll } from "../../types/poll";
 import { motion, AnimatePresence } from "motion/react";
 import { 
   Users, 
@@ -63,6 +65,9 @@ export default function TeacherHub({ language }: TeacherHubProps) {
   // Local stats from store
   const [registeredCount, setRegisteredCount] = useState(0);
 
+  // Polls state
+  const [teacherPolls, setTeacherPolls] = useState<Poll[]>([]);
+
   // Contact Form State
   const [contactForm, setContactForm] = useState({ name: "", email: "", mobile: "", message: "" });
   const [contactSubmitted, setContactSubmitted] = useState(false);
@@ -93,6 +98,16 @@ export default function TeacherHub({ language }: TeacherHubProps) {
     const updateStats = () => {
       setRegisteredCount(globalTeacherStore.getTeachers().length);
     };
+
+    // Fetch Teacher Hub Polls
+    fetch("/api/polls?category=Teacher Hub")
+      .then(res => res.json())
+      .then(d => {
+        if (d.success && Array.isArray(d.polls)) {
+          setTeacherPolls(d.polls);
+        }
+      })
+      .catch(e => console.warn("Failed to fetch teacher polls:", e));
 
     updateStats();
     const unsubscribe = globalTeacherStore.subscribe(updateStats);
@@ -603,6 +618,46 @@ export default function TeacherHub({ language }: TeacherHubProps) {
                             </span>
                           </div>
                         </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* TEACHER OPINION POLLS SECTION */}
+                {teacherPolls.length > 0 && (
+                  <div className="space-y-4 text-left">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="h-8 w-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold">
+                          📊
+                        </div>
+                        <div>
+                          <h3 className="text-base font-black text-slate-900">
+                            {language === "hi" ? "शिक्षक जनमत सर्वेक्षण (Teacher Opinion Polls)" : "Teacher Opinion Polls"}
+                          </h3>
+                          <p className="text-xs text-slate-400 font-medium">
+                            {language === "hi" ? "नीतिगत विषयों और स्थानांतरण नियमों पर अपना वोट दर्ज करें" : "Vote on key state policy topics, mutual transfer rules, and teacher welfare"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {teacherPolls.map(poll => (
+                        <PollCard
+                          key={poll.id}
+                          poll={poll}
+                          currentUser={(() => {
+                            try {
+                              const s = localStorage.getItem("paisa_active_session");
+                              if (!s) return null;
+                              const p = JSON.parse(s);
+                              return p?.email && p.email.toLowerCase() !== "guest@paisablueprint.in" ? p : null;
+                            } catch {
+                              return null;
+                            }
+                          })()}
+                        />
                       ))}
                     </div>
                   </div>
