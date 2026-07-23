@@ -99,12 +99,12 @@ export default function TeacherHub({ language }: TeacherHubProps) {
       setRegisteredCount(globalTeacherStore.getTeachers().length);
     };
 
-    // Fetch Teacher Hub Polls
-    fetch("/api/polls?category=Teacher Hub")
+    // Fetch Published Polls for Teacher Hub
+    fetch("/api/polls")
       .then(res => res.json())
       .then(d => {
         if (d.success && Array.isArray(d.polls)) {
-          setTeacherPolls(d.polls);
+          setTeacherPolls(d.polls.filter((p: any) => p.status === "Published"));
         }
       })
       .catch(e => console.warn("Failed to fetch teacher polls:", e));

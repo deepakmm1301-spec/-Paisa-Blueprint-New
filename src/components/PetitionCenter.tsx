@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import { 
   Scale, Users, Calendar, AlertCircle, Share2, Download, 
   MessageSquare, CheckCircle, Clock, Send, ChevronRight, 
-  MapPin, Award, ArrowLeft, Heart, Sparkles, Building, Phone
+  MapPin, Award, ArrowLeft, Heart, Sparkles, Building, Phone, Vote
 } from "lucide-react";
 import { 
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid 
 } from "recharts";
 import { motion, AnimatePresence } from "motion/react";
+import { PollCard } from "./polls/PollCard";
 
 // Standard Bihar Districts List
 const BIHAR_DISTRICTS = [
@@ -67,10 +68,31 @@ export default function PetitionCenter({ language = "hi", sessionUser, onNavigat
   // Analytics trajectory data (simulated progression or fetched dynamically)
   const [trajectoryData, setTrajectoryData] = useState<any[]>([]);
 
-  // 1. Fetch petitions list on mount
+  // Live Polls state
+  const [livePolls, setLivePolls] = useState<any[]>([]);
+  const [pollsLoading, setPollsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<"polls" | "petitions">("polls");
+
+  // Fetch petitions and live polls list on mount
   useEffect(() => {
     fetchPetitions();
+    fetchLivePolls();
   }, []);
+
+  const fetchLivePolls = async () => {
+    try {
+      setPollsLoading(true);
+      const res = await fetch("/api/polls");
+      const data = await res.json();
+      if (data.success && Array.isArray(data.polls)) {
+        setLivePolls(data.polls.filter((p: any) => p.status === "Published"));
+      }
+    } catch (err) {
+      console.warn("[LIVE POLLS] Failed to fetch live polls:", err);
+    } finally {
+      setPollsLoading(false);
+    }
+  };
 
   const fetchPetitions = async () => {
     try {
@@ -429,7 +451,97 @@ export default function PetitionCenter({ language = "hi", sessionUser, onNavigat
         </div>
       </div>
 
-      {activeCamp && selectedPetition && (
+      {/* 2. Primary Navigation Tabs: Live Opinion Polls vs Petition Campaign */}
+      <div className="flex flex-wrap items-center justify-between gap-4 p-2 bg-slate-100 rounded-2xl border border-slate-200/80">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setActiveTab("polls")}
+            className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer ${
+              activeTab === "polls"
+                ? "bg-amber-500 text-amber-950 shadow-md font-black"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
+            }`}
+          >
+            <Vote className="w-4 h-4 text-amber-950" />
+            <span>{language === "hi" ? "लाइव जनमत सर्वेक्षण और वोट" : "Live Opinion Polls & Voting"}</span>
+            {livePolls.length > 0 && (
+              <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-950 text-amber-300 font-extrabold ml-1">
+                {livePolls.length}
+              </span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("petitions")}
+            className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer ${
+              activeTab === "petitions"
+                ? "bg-amber-500 text-amber-950 shadow-md font-black"
+                : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
+            }`}
+          >
+            <Scale className="w-4 h-4 text-amber-950" />
+            <span>{language === "hi" ? "याचिका एवं मांग पत्र" : "Petitions & Advocacy"}</span>
+          </button>
+        </div>
+
+        <button
+          type="button"
+          onClick={fetchLivePolls}
+          className="px-3 py-1.5 text-xs text-slate-600 hover:text-slate-900 font-bold flex items-center gap-1.5 cursor-pointer"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+          <span>{language === "hi" ? "लाइव डेटा रिफ्रेश करें" : "Refresh Live Data"}</span>
+        </button>
+      </div>
+
+      {/* 3. TAB CONTENT: LIVE POLLS */}
+      {activeTab === "polls" && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg md:text-xl font-black text-slate-900 flex items-center gap-2">
+                <Vote className="w-5 h-5 text-amber-600" />
+                <span>{language === "hi" ? "सक्रिय लाइव वोटिंग और पोल केंद्र" : "Active Live Voting & Opinion Polls"}</span>
+              </h2>
+              <p className="text-xs text-slate-500 font-medium mt-0.5">
+                {language === "hi" 
+                  ? "नीतिगत फैसलों और शिक्षक अधिकारों पर अपना आधिकारिक वोट दें। प्रत्येक खाता 1 वोट दे सकता है।" 
+                  : "Cast your official vote on policy reforms and rights. Each account is verified for transparent results."}
+              </p>
+            </div>
+          </div>
+
+          {livePolls.length === 0 ? (
+            <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 space-y-3">
+              <Vote className="w-12 h-12 text-slate-300 mx-auto" />
+              <h3 className="text-base font-black text-slate-800">
+                {language === "hi" ? "वर्तमान में कोई सक्रिय लाइव पोल नहीं है" : "No Active Live Polls Found"}
+              </h3>
+              <p className="text-xs text-slate-500 max-w-md mx-auto">
+                {language === "hi" 
+                  ? "प्रशासक द्वारा पोल प्रकाशित करते ही यह तुरंत यहां दिखाई देगा।" 
+                  : "Once a poll is published by the administrator, it will instantly appear live here for voting."}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {livePolls.map(poll => (
+                <PollCard
+                  key={poll.id}
+                  poll={poll}
+                  currentUser={sessionUser || { email: "guest@paisablueprint.in" }}
+                  onVoteSuccess={() => fetchLivePolls()}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 4. TAB CONTENT: PETITIONS & ADVOCACY */}
+      {activeTab === "petitions" && activeCamp && selectedPetition && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* LEFT & CENTER: Narrative, Trajectory, Comments */}
           <div className="lg:col-span-2 space-y-8">
