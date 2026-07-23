@@ -280,6 +280,7 @@ export default function PollManagement({ language = "hi", userRole = "admin" }: 
       const d = await res.json();
       if (d.success) {
         showNotification("Poll deleted permanently.");
+        setPolls(prev => prev.filter(p => p.id !== pollId));
         fetchPolls();
         fetchAnalytics();
         if (editingPoll?.id === pollId) {

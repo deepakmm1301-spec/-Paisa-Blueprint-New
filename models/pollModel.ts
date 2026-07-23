@@ -151,8 +151,12 @@ async function getFallbackState(): Promise<{ polls: PollRecord[]; votes: any[] }
       .eq("id", "polls_global_state")
       .maybeSingle();
 
-    if (data && data.payload) {
-      return data.payload;
+    if (data && data.payload && Array.isArray(data.payload.polls)) {
+      // Filter out legacy removed system polls if present
+      const cleanedPolls = data.payload.polls.filter(
+        (p: any) => p.id !== "a3030303-3333-4444-8888-333333333333" && p.id !== "a4040404-4444-4444-8888-444444444444"
+      );
+      return { polls: cleanedPolls, votes: data.payload.votes || [] };
     }
   } catch (err) {
     logger.warn("Error reading fallback poll state:", err);
@@ -217,8 +221,12 @@ export class PollModel {
         return this.filterPollsLocally(state.polls, filters, state.votes);
       }
 
+      const cleanedPollsData = pollsData.filter(
+        p => p.id !== "a3030303-3333-4444-8888-333333333333" && p.id !== "a4040404-4444-4444-8888-444444444444"
+      );
+
       // Fetch options for all returned polls
-      const pollIds = pollsData.map(p => p.id);
+      const pollIds = cleanedPollsData.map(p => p.id);
       let optionsMap: Record<string, PollOptionRecord[]> = {};
 
       if (pollIds.length > 0) {
@@ -253,7 +261,7 @@ export class PollModel {
         }
       }
 
-      return pollsData.map(poll => ({
+      return cleanedPollsData.map(poll => ({
         ...poll,
         options: optionsMap[poll.id] || [],
         user_votes: userVotesMap[poll.id] || []
@@ -635,16 +643,20 @@ export class PollModel {
   static async deletePoll(pollId: string): Promise<boolean> {
     if (supabase) {
       try {
-        await supabase.from("polls").delete().eq("id", pollId);
-        return true;
+        await supabase.from("poll_votes").delete().eq("poll_id", pollId);
+        await supabase.from("poll_options").delete().eq("poll_id", pollId);
+        const { error } = await supabase.from("polls").delete().eq("id", pollId);
+        if (error) {
+          logger.error("Error deleting poll from Supabase polls table:", error.message);
+        }
       } catch (err) {
         logger.error("Error deleting poll from Supabase, trying fallback:", err);
       }
     }
 
     const state = await getFallbackState();
-    state.polls = state.polls.filter(p => p.id !== pollId);
-    state.votes = state.votes.filter(v => v.poll_id !== pollId);
+    state.polls = (state.polls || []).filter(p => p.id !== pollId);
+    state.votes = (state.votes || []).filter(v => v.poll_id !== pollId);
     await saveFallbackState(state);
     return true;
   }
