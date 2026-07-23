@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { getShareableLink } from "../../types";
 import { 
   Share2, 
   Copy, 
@@ -41,9 +42,7 @@ export const PollShareBar: React.FC<PollShareBarProps> = ({
   
   // Direct URL that opens this exact poll page
   const getPollUrl = () => {
-    if (typeof window === "undefined") return `https://paisablueprint.in/polls/${slug}`;
-    const origin = window.location.origin;
-    return `${origin}/polls/${slug}`;
+    return getShareableLink("polls", `/polls/${slug}`);
   };
 
   const shareUrl = getPollUrl();

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { getShareableLink } from "../types";
 import { 
   Scale, Users, Calendar, AlertCircle, Share2, Download, 
   MessageSquare, CheckCircle, Clock, Send, ChevronRight, 
@@ -602,7 +603,8 @@ export default function PetitionCenter({ language = "hi", sessionUser, onNavigat
                   </p>
                   <button
                     onClick={() => {
-                      const shareMsg = encodeURIComponent(`I signed the official Bihar BPSC Teacher Mutual Transfer petition! Join ${currentSigs} teachers here: ${window.location.href}`);
+                      const shareLink = getShareableLink("petition_center", "/petitions");
+                      const shareMsg = encodeURIComponent(`I signed the official Bihar BPSC Teacher Mutual Transfer petition! Join ${currentSigs} teachers here: ${shareLink}`);
                       window.open(`https://api.whatsapp.com/send?text=${shareMsg}`, "_blank");
                     }}
                     className="w-full py-2.5 bg-emerald-600 text-white font-black text-xs rounded-xl flex items-center justify-center gap-2 shadow-xs cursor-pointer"

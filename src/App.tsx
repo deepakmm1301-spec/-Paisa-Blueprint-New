@@ -479,6 +479,29 @@ export default function App() {
       if (cleanPath === "/verify-email") return "verify_email";
 
       if (cleanPath === "") {
+        if (typeof window !== "undefined") {
+          const hash = (window.location.hash || "").toLowerCase();
+          if (hash.includes("sip")) return "sip";
+          if (hash.includes("nps")) return "nps_govt";
+          if (hash.includes("da")) return "bihar_da";
+          if (hash.includes("bpsc")) return "bpsc_salary";
+          if (hash.includes("8th-pay") || hash.includes("pay-commission")) return "eight_pay_calc";
+          if (hash.includes("pension")) return "pension";
+          if (hash.includes("salary")) return "salary";
+          if (hash.includes("petition")) return "petition_center";
+          if (hash.includes("teacher") || hash.includes("transfer")) return "teacher_hub";
+          if (hash.includes("poll")) return "polls";
+          if (hash.includes("pdf") || hash.includes("student")) return "student_pdf";
+          if (hash.includes("health")) return "health";
+          if (hash.includes("retirement")) return "retirement";
+          if (hash.includes("goal")) return "goals";
+          if (hash.includes("tax")) return "tax";
+          if (hash.includes("wealth") || hash.includes("networth")) return "networth";
+          if (hash.includes("cibil") || hash.includes("credit")) return "cibil";
+          if (hash.includes("debt")) return "debt";
+          if (hash.includes("coach") || hash.includes("ai")) return "coach";
+          if (hash.includes("article") || hash.includes("cabinet")) return "seohub";
+        }
         return "bpsc_salary";
       }
       return "bpsc_salary";
@@ -971,16 +994,53 @@ export default function App() {
   // Deriving the active profile based on selection
   const profile = profiles.find(p => p.id === activeProfileId) || profiles[0] || { ...defaultProfile, id: "profile-main" };
 
-  // Smooth scroll logic on widget selection
+  // Automatic deep link scroll & navigation handler across full platform
   useEffect(() => {
-    if (isFirstMount.current) {
+    if (typeof window === "undefined") return;
+
+    const performScroll = () => {
+      const rawHash = window.location.hash;
+      if (rawHash && rawHash.length > 1) {
+        const cleanHash = rawHash.replace(/^#/, "");
+        if (cleanHash) {
+          let attempts = 0;
+          const interval = setInterval(() => {
+            attempts++;
+            const el = document.getElementById(cleanHash) ||
+                       document.getElementById(`${cleanHash}-module`) ||
+                       document.getElementById(`${cleanHash}-section`) ||
+                       document.querySelector(`[data-section="${cleanHash}"]`) ||
+                       document.querySelector(`a[name="${cleanHash}"]`);
+            if (el) {
+              clearInterval(interval);
+              el.scrollIntoView({ behavior: "smooth", block: "start" });
+            } else if (attempts > 20) {
+              clearInterval(interval);
+              if (contentRef.current) {
+                contentRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+              }
+            }
+          }, 80);
+          return;
+        }
+      }
+
+      if (!isFirstMount.current || (window.location.pathname !== "/" && window.location.pathname !== "")) {
+        if (contentRef.current) {
+          contentRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }
       isFirstMount.current = false;
-      return;
-    }
-    if (contentRef.current) {
-      contentRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }, [activeWidget]);
+    };
+
+    const timer = setTimeout(performScroll, 120);
+
+    window.addEventListener("hashchange", performScroll);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("hashchange", performScroll);
+    };
+  }, [activeWidget, pollSlug]);
 
   // Pull latest central ledger details on load if session is active
   useEffect(() => {

@@ -102,16 +102,64 @@ export function getShareableLink(widget?: string, pathName?: string): string {
 
     if (pathName) {
       const cleanPath = pathName.startsWith("/") ? pathName : `/${pathName}`;
-      const targetQuery = widget ? `?widget=${widget}` : "";
-      return `${base}${cleanPath}${targetQuery}`;
-    } else if (widget) {
+      return `${base}${cleanPath}`;
+    }
+
+    if (widget) {
+      const WIDGET_PATH_MAP: Record<string, string> = {
+        bpsc_salary: "/",
+        bihar_da: "/da-calculator",
+        govt_sip: "/government-employee-sip-calculator",
+        nps_govt: "/nps-calculator",
+        eight_pay_calc: "/8th-pay-commission-salary-calculator",
+        eight_pay_fitment: "/8th-pay-fitment-factor-calculator",
+        eight_pay_hike: "/8th-pay-salary-hike-calculator",
+        eight_pay_pension: "/8th-pay-pension-calculator",
+        eight_pay_news: "/8th-pay-commission-latest-news",
+        eight_pay_fitment_info: "/8th-pay-commission-fitment-factor",
+        eight_pay_chart: "/8th-pay-commission-salary-chart",
+        eight_pay_date: "/8th-pay-commission-date",
+        eight_pay_teachers: "/8th-pay-commission-for-teachers",
+        salary: "/salary-calculator",
+        pension: "/pension-calculator",
+        sip: "/sip-calculator",
+        retirement: "/retirement-roadmap",
+        goals: "/my-goal-planner",
+        tax: "/tax-regime-optimizer",
+        networth: "/my-wealth-tracker",
+        cibil: "/cibil-credit-card",
+        debt: "/debt-freedom-planner",
+        coach: "/paisa-ai-coach",
+        learning: "/paise-to-rupee-wisdom",
+        health: "/health-scorecard",
+        dashboard: "/dashboard",
+        seohub: "/cabinet-and-resources",
+        student_pdf: "/student-pdf-toolkit",
+        teacher_hub: "/teacher-hub",
+        petition_center: "/petitions",
+        polls: "/polls",
+        about: "/about",
+        contact: "/contact",
+        admin_portal: "/admin",
+        login: "/login",
+        signup: "/signup",
+        forgot_password: "/forgot-password",
+        reset_password: "/reset-password",
+        verify_email: "/verify-email"
+      };
+
+      const mapped = WIDGET_PATH_MAP[widget];
+      if (mapped) {
+        return `${base}${mapped}`;
+      }
       return `${base}/?widget=${widget}`;
     }
     
     if (typeof window !== "undefined") {
       const currentPath = window.location.pathname;
       const currentSearch = window.location.search || "";
-      return `${base}${currentPath}${currentSearch}`;
+      const currentHash = window.location.hash || "";
+      return `${base}${currentPath}${currentSearch}${currentHash}`;
     }
     
     return base;

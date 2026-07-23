@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { getShareableLink } from "../../types";
 import { 
   ArrowLeft, 
   Vote, 
@@ -300,7 +301,7 @@ export const PollDetailPage: React.FC<PollDetailPageProps> = ({
     }
   };
 
-  const shareUrl = typeof window !== "undefined" ? window.location.href : `https://paisablueprint.in/polls/${slug}`;
+  const shareUrl = getShareableLink("polls", `/polls/${slug}`);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareUrl);
