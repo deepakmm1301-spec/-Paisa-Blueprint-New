@@ -661,6 +661,9 @@ export default function TeacherHub({ language }: TeacherHubProps) {
                               return null;
                             }
                           })()}
+                          onVoteSuccess={(updatedPoll) => {
+                            setTeacherPolls(prev => prev.map(p => p.id === updatedPoll.id ? updatedPoll : p));
+                          }}
                         />
                       ))}
                     </div>
