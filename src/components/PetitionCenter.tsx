@@ -41,10 +41,66 @@ interface PetitionCenterProps {
   onNavigateToWidget?: (widget: string) => void;
 }
 
+const DEFAULT_FALLBACK_PETITION = {
+  id: "pet-bpsc-transfer-2026",
+  title: "Simplification and Direct Implementation of Bihar BPSC Teacher Mutual Transfer Rules",
+  slug: "bihar-bpsc-teacher-mutual-transfer",
+  shortDescription: "Join the collective demand of 1.5 Lakh BPSC TRE teachers seeking simplified, unconditional, and immediate online mutual transfer policies with home-district provisions.",
+  category: "Education / Transfer Rules",
+  bannerImage: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=1200",
+  featuredImage: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=400",
+  govDepartment: "Education Department, Government of Bihar",
+  petitionGoal: 15000,
+  currentSignatures: 8742,
+  status: "published",
+  startDate: "2026-07-07T00:00:00.000Z",
+  endDate: "2026-12-31T23:59:59.000Z",
+  createdBy: "deepak.mm1301@gmail.com",
+  featured: true,
+  createdAt: "2026-07-07T00:00:00.000Z"
+};
+
+const getFallbackDetail = (pet: any) => {
+  const p = pet || DEFAULT_FALLBACK_PETITION;
+  const fallbackSigs = [
+    { name: "Deepak Kumar", district: "Patna", school: "GMS Danapur", teacherCategory: "BPSC TRE 1.0 (PRT)", createdAt: "2026-07-10T12:00:00Z" },
+    { name: "Aarav Sharma", district: "Muzaffarpur", school: "UMS Kanti", teacherCategory: "BPSC TRE 2.0 (Middle)", createdAt: "2026-07-11T09:30:00Z" },
+    { name: "Priya Ranjan", district: "Gaya", school: "GHS Gaya", teacherCategory: "BPSC TRE 1.0 (TGT)", createdAt: "2026-07-12T14:15:00Z" },
+    { name: "Anjali Kumari", district: "Bhagalpur", school: "UMS Bhagalpur", teacherCategory: "BPSC TRE 2.0 (PRT)", createdAt: "2026-07-13T10:05:00Z" },
+  ];
+
+  const fallbackComments = [
+    { id: "com-1", userName: "Rajesh Mishra", content: "Unconditional mutual transfer is our fundamental democratic right. 3 TREs completed, yet thousands of teachers are living 300km away from their families. Home-district postings are critical for physical and mental productivity.", createdAt: "2026-07-12T05:00:00Z", status: "approved" },
+    { id: "com-2", userName: "Kumari Sneha", content: "As a female teacher with a 2-year old child, travelling 4 hours daily to school is exhausting. Mutual transfer simplification is extremely urgent! Please sign this petition and share widely on WhatsApp.", createdAt: "2026-07-13T08:24:00Z", status: "approved" },
+    { id: "com-3", userName: "Vikash Paswan", content: "The current three-option system in TRE allocations separated families. Simple online portal with peer-matching (like Paisa Blueprint) should be officially approved.", createdAt: "2026-07-13T11:40:00Z", status: "approved" }
+  ];
+
+  const fallbackUpdates = [
+    { id: "upd-1", title: "Official Representation Handed to Additional Chief Secretary", content: "A formal memorandum representing our collective demands and signature log up to 5,000 counts has been hand-delivered to the Education Department, Patna. Officials acknowledged the bottlenecks in NOC verification.", createdAt: "2026-07-10T11:00:00Z" }
+  ];
+
+  const fallbackDocs = [
+    { id: "doc-1", title: "Education Dept Circular 2026 (Draft Transfer Rules)", url: "https://state.bihar.gov.in/educationbihar/", size: "1.2 MB", format: "PDF" },
+    { id: "doc-2", title: "Advocacy Charter - Mutual Transfer Simplification Blueprint", url: "#", size: "480 KB", format: "PDF" }
+  ];
+
+  return {
+    petition: p,
+    hasSigned: false,
+    stats: {
+      totalSignatures: p.currentSignatures || 8742,
+      recentSignatures: fallbackSigs
+    },
+    comments: fallbackComments,
+    updates: fallbackUpdates,
+    documents: fallbackDocs
+  };
+};
+
 export default function PetitionCenter({ language = "hi", sessionUser, onNavigateToWidget }: PetitionCenterProps) {
-  const [petitions, setPetitions] = useState<any[]>([]);
-  const [selectedPetition, setSelectedPetition] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [petitions, setPetitions] = useState<any[]>([DEFAULT_FALLBACK_PETITION]);
+  const [selectedPetition, setSelectedPetition] = useState<any>(() => getFallbackDetail(DEFAULT_FALLBACK_PETITION));
+  const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -71,7 +127,24 @@ export default function PetitionCenter({ language = "hi", sessionUser, onNavigat
   // Live Polls state
   const [livePolls, setLivePolls] = useState<any[]>([]);
   const [pollsLoading, setPollsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"polls" | "petitions">("polls");
+  const [activeTab, setActiveTab] = useState<"polls" | "petitions">(() => {
+    const saved = localStorage.getItem("paisa_petition_tab");
+    if (saved === "petitions" || saved === "polls") return saved;
+    return "polls";
+  });
+
+  // Re-sync tab if saved in localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("paisa_petition_tab");
+    if (saved === "petitions" || saved === "polls") {
+      setActiveTab(saved);
+    }
+  }, []);
+
+  const handleTabChange = (tab: "polls" | "petitions") => {
+    setActiveTab(tab);
+    localStorage.setItem("paisa_petition_tab", tab);
+  };
 
   // Fetch petitions and live polls list on mount
   useEffect(() => {
@@ -96,114 +169,50 @@ export default function PetitionCenter({ language = "hi", sessionUser, onNavigat
 
   const fetchPetitions = async () => {
     try {
-      setLoading(true);
       setError(null);
       const res = await fetch("/api/petitions");
       const data = await res.json();
-      if (data.success) {
+      if (data.success && Array.isArray(data.petitions) && data.petitions.length > 0) {
         setPetitions(data.petitions);
         
         // If there's an active campaign, auto-select BPSC Teacher Mutual Transfer
         const bpscCamp = data.petitions.find((p: any) => p.slug === "bihar-bpsc-teacher-mutual-transfer" || p.id === "pet-bpsc-transfer-2026");
-        if (bpscCamp) {
-          fetchPetitionDetail(bpscCamp.slug);
-        } else if (data.petitions.length > 0) {
-          fetchPetitionDetail(data.petitions[0].slug);
-        }
+        const targetSlug = bpscCamp ? bpscCamp.slug : data.petitions[0].slug;
+        fetchPetitionDetail(targetSlug, data.petitions);
       } else {
-        throw new Error(data.message || "Failed to load petition directory.");
+        setupFallbackDetail(DEFAULT_FALLBACK_PETITION);
       }
     } catch (err: any) {
       console.warn("[PETITIONS FRONTEND] Server fetch error, initializing high-fidelity local fallback:", err);
-      // Dual fallback data matching BPSC Transfer Campaign requirements
-      const fallbackPetitions = [
-        {
-          id: "pet-bpsc-transfer-2026",
-          title: "Simplification and Direct Implementation of Bihar BPSC Teacher Mutual Transfer Rules",
-          slug: "bihar-bpsc-teacher-mutual-transfer",
-          shortDescription: "Join the collective demand of 1.5 Lakh BPSC TRE teachers seeking simplified, unconditional, and immediate online mutual transfer policies with home-district provisions.",
-          category: "Education / Transfer Rules",
-          bannerImage: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=1200",
-          featuredImage: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=400",
-          govDepartment: "Education Department, Government of Bihar",
-          petitionGoal: 15000,
-          currentSignatures: 8742,
-          status: "published",
-          startDate: "2026-07-07T00:00:00.000Z",
-          endDate: "2026-12-31T23:59:59.000Z",
-          createdBy: "deepak.mm1301@gmail.com",
-          featured: true,
-          createdAt: "2026-07-07T00:00:00.000Z"
-        }
-      ];
-      setPetitions(fallbackPetitions);
-      setupFallbackDetail(fallbackPetitions[0]);
-    } finally {
-      setLoading(false);
+      setPetitions([DEFAULT_FALLBACK_PETITION]);
+      setupFallbackDetail(DEFAULT_FALLBACK_PETITION);
     }
   };
 
-  const fetchPetitionDetail = async (slug: string) => {
+  const fetchPetitionDetail = async (slug: string, currentPetitionsList?: any[]) => {
+    const petList = (currentPetitionsList && currentPetitionsList.length > 0) ? currentPetitionsList : petitions;
     try {
-      setLoading(true);
       const emailParam = sessionUser?.email ? `?email=${encodeURIComponent(sessionUser.email)}` : "";
       const res = await fetch(`/api/petitions/${slug}${emailParam}`);
       const data = await res.json();
-      if (data.success) {
+      if (data.success && data.petition) {
         setSelectedPetition(data);
-        
-        // Compile Recharts signing progression
         const sigs = data.stats?.recentSignatures || [];
         generateTrajectory(data.petition.currentSignatures, sigs);
       } else {
-        const matching = petitions.find(p => p.slug === slug);
-        if (matching) setupFallbackDetail(matching);
+        const matching = petList.find((p: any) => p.slug === slug) || petList[0] || DEFAULT_FALLBACK_PETITION;
+        setupFallbackDetail(matching);
       }
     } catch (err) {
-      const matching = petitions.find(p => p.slug === slug);
-      if (matching) setupFallbackDetail(matching);
-    } finally {
-      setLoading(false);
+      const matching = petList.find((p: any) => p.slug === slug) || petList[0] || DEFAULT_FALLBACK_PETITION;
+      setupFallbackDetail(matching);
     }
   };
 
   const setupFallbackDetail = (pet: any) => {
-    // Generate simulated signatures, comments, and updates for clean initial fallback
-    const fallbackSigs = [
-      { name: "Deepak Kumar", district: "Patna", school: "GMS Danapur", teacherCategory: "BPSC TRE 1.0 (PRT)", createdAt: "2026-07-10T12:00:00Z" },
-      { name: "Aarav Sharma", district: "Muzaffarpur", school: "UMS Kanti", teacherCategory: "BPSC TRE 2.0 (Middle)", createdAt: "2026-07-11T09:30:00Z" },
-      { name: "Priya Ranjan", district: "Gaya", school: "GHS Gaya", teacherCategory: "BPSC TRE 1.0 (TGT)", createdAt: "2026-07-12T14:15:00Z" },
-      { name: "Anjali Kumari", district: "Bhagalpur", school: "UMS Bhagalpur", teacherCategory: "BPSC TRE 2.0 (PRT)", createdAt: "2026-07-13T10:05:00Z" },
-    ];
-
-    const fallbackComments = [
-      { id: "com-1", userName: "Rajesh Mishra", content: "Unconditional mutual transfer is our fundamental democratic right. 3 TREs completed, yet thousands of teachers are living 300km away from their families. Home-district postings are critical for physical and mental productivity.", createdAt: "2026-07-12T05:00:00Z", status: "approved" },
-      { id: "com-2", userName: "Kumari Sneha", content: "As a female teacher with a 2-year old child, travelling 4 hours daily to school is exhausting. Mutual transfer simplification is extremely urgent! Please sign this petition and share widely on WhatsApp.", createdAt: "2026-07-13T08:24:00Z", status: "approved" },
-      { id: "com-3", userName: "Vikash Paswan", content: "The current three-option system in TRE allocations separated families. Simple online portal with peer-matching (like Paisa Blueprint) should be officially approved.", createdAt: "2026-07-13T11:40:00Z", status: "approved" }
-    ];
-
-    const fallbackUpdates = [
-      { id: "upd-1", title: "Official Representation Handed to Additional Chief Secretary", content: "A formal memorandum representing our collective demands and signature log up to 5,000 counts has been hand-delivered to the Education Department, Patna. Officials acknowledged the bottlenecks in NOC verification.", createdAt: "2026-07-10T11:00:00Z" }
-    ];
-
-    const fallbackDocs = [
-      { id: "doc-1", title: "Education Dept Circular 2026 (Draft Transfer Rules)", url: "https://state.bihar.gov.in/educationbihar/", size: "1.2 MB", format: "PDF" },
-      { id: "doc-2", title: "Advocacy Charter - Mutual Transfer Simplification Blueprint", url: "#", size: "480 KB", format: "PDF" }
-    ];
-
-    setSelectedPetition({
-      petition: pet,
-      hasSigned: false,
-      stats: {
-        totalSignatures: pet.currentSignatures,
-        recentSignatures: fallbackSigs
-      },
-      comments: fallbackComments,
-      updates: fallbackUpdates,
-      documents: fallbackDocs
-    });
-
-    generateTrajectory(pet.currentSignatures, fallbackSigs);
+    const detailObj = getFallbackDetail(pet);
+    setSelectedPetition(detailObj);
+    generateTrajectory(detailObj.petition.currentSignatures, detailObj.stats.recentSignatures);
   };
 
   const generateTrajectory = (totalCount: number, recentSigs: any[]) => {
@@ -456,7 +465,7 @@ export default function PetitionCenter({ language = "hi", sessionUser, onNavigat
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => setActiveTab("polls")}
+            onClick={() => handleTabChange("polls")}
             className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === "polls"
                 ? "bg-amber-500 text-amber-950 shadow-md font-black"
@@ -474,7 +483,7 @@ export default function PetitionCenter({ language = "hi", sessionUser, onNavigat
 
           <button
             type="button"
-            onClick={() => setActiveTab("petitions")}
+            onClick={() => handleTabChange("petitions")}
             className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === "petitions"
                 ? "bg-amber-500 text-amber-950 shadow-md font-black"
@@ -541,7 +550,7 @@ export default function PetitionCenter({ language = "hi", sessionUser, onNavigat
       )}
 
       {/* 4. TAB CONTENT: PETITIONS & ADVOCACY */}
-      {activeTab === "petitions" && activeCamp && selectedPetition && (
+      {activeTab === "petitions" && activeCamp && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* LEFT & CENTER: Narrative, Trajectory, Comments */}
           <div className="lg:col-span-2 space-y-8">

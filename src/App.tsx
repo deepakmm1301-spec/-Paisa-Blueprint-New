@@ -493,7 +493,8 @@ export default function App() {
           "goals", "tax", "networth", "cibil", "debt", "coach", "seohub", "learning",
           "eight_pay_calc", "eight_pay_fitment", "eight_pay_hike", "eight_pay_pension",
           "eight_pay_news", "eight_pay_fitment_info", "eight_pay_chart", "eight_pay_date", "eight_pay_teachers",
-          "about", "contact", "student_pdf"
+          "about", "contact", "student_pdf", "petition_center", "teacher_hub", "admin_portal",
+          "bpsc_salary", "bihar_da", "govt_sip", "nps_govt", "login", "signup", "forgot_password", "reset_password", "verify_email"
         ];
         if (validWidgets.includes(queryWidget)) {
           return queryWidget as ActiveWidget;
@@ -1436,6 +1437,7 @@ export default function App() {
             {/* Sign Petition button (Compact, Glowing, Blinking) */}
             <button
               onClick={() => {
+                localStorage.setItem("paisa_petition_tab", "petitions");
                 setActiveWidget("petition_center");
                 if (contentRef.current) {
                   contentRef.current.scrollIntoView({ behavior: "smooth" });
@@ -1737,6 +1739,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => {
+                  localStorage.setItem("paisa_petition_tab", "polls");
                   setActiveWidget("petition_center");
                   if (contentRef.current) {
                     contentRef.current.scrollIntoView({ behavior: "smooth" });
