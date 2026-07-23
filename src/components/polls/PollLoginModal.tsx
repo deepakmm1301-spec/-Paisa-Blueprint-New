@@ -25,7 +25,7 @@ export const PollLoginModal: React.FC<PollLoginModalProps> = ({
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-all"
+          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-all cursor-pointer"
           aria-label="Close modal"
         >
           <X className="w-5 h-5" />
@@ -44,14 +44,14 @@ export const PollLoginModal: React.FC<PollLoginModalProps> = ({
 
         {/* Text Content */}
         <div className="text-center space-y-2">
-          <h3 className="text-lg font-black text-slate-900">Sign in to Submit Your Vote</h3>
-          <p className="text-xs text-slate-600 leading-relaxed">
-            Please log in to participate in this poll. One account can vote only once to maintain fair and accurate results.
+          <h3 className="text-xl font-black text-slate-900 font-display">Login Required</h3>
+          <p className="text-xs text-slate-600 leading-relaxed font-medium">
+            To maintain fair and accurate polls, each verified account can vote only once. Please sign in or create a free account to cast your vote.
           </p>
         </div>
 
         {/* Action Buttons */}
-        <div className="space-y-3 pt-2">
+        <div className="space-y-2.5 pt-2">
           <button
             onClick={() => {
               onClose();
@@ -60,7 +60,7 @@ export const PollLoginModal: React.FC<PollLoginModalProps> = ({
             className="w-full py-3 px-4 bg-rose-500 hover:bg-rose-600 text-white rounded-2xl text-xs font-bold flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
           >
             <LogIn className="w-4 h-4" />
-            <span>Log In to Vote</span>
+            <span>Login</span>
           </button>
 
           <button
@@ -68,10 +68,17 @@ export const PollLoginModal: React.FC<PollLoginModalProps> = ({
               onClose();
               onSignup();
             }}
-            className="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer"
+            className="w-full py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
-            <UserPlus className="w-4 h-4 text-slate-500" />
-            <span>Create Free Account</span>
+            <UserPlus className="w-4 h-4 text-slate-300" />
+            <span>Create Account</span>
+          </button>
+
+          <button
+            onClick={onClose}
+            className="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl text-xs font-bold transition-all cursor-pointer"
+          >
+            Cancel
           </button>
         </div>
 
@@ -82,3 +89,4 @@ export const PollLoginModal: React.FC<PollLoginModalProps> = ({
     </div>
   );
 };
+

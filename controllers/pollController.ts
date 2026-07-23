@@ -96,10 +96,11 @@ export const pollController = {
 
       const userId = req.user?.email || req.user?.id || bodyUserId;
 
-      if (!userId) {
+      if (!userId || userId.toLowerCase().trim() === "guest@paisablueprint.in") {
         res.status(401).json({
           success: false,
           requireLogin: true,
+          code: "LOGIN_REQUIRED",
           message: "Please log in to participate in this poll. One account can vote only once to maintain fair and accurate results."
         });
         return;

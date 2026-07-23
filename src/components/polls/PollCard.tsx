@@ -39,6 +39,32 @@ export const PollCard: React.FC<PollCardProps> = ({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
+  const getAuthenticatedUser = (userCandidate?: any) => {
+    if (
+      userCandidate &&
+      userCandidate.email &&
+      userCandidate.email.toLowerCase().trim() !== "guest@paisablueprint.in"
+    ) {
+      return userCandidate;
+    }
+    try {
+      const saved = localStorage.getItem("paisa_active_session");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (
+          parsed &&
+          parsed.email &&
+          parsed.email.toLowerCase().trim() !== "guest@paisablueprint.in"
+        ) {
+          return parsed;
+        }
+      }
+    } catch {}
+    return null;
+  };
+
+  const activeUser = getAuthenticatedUser(currentUser);
+
   useEffect(() => {
     setPoll(initialPoll);
     if (initialPoll.user_votes && initialPoll.user_votes.length > 0) {
@@ -54,11 +80,6 @@ export const PollCard: React.FC<PollCardProps> = ({
 
   const handleOptionToggle = (optionId: string) => {
     setErrorMsg(null);
-    if (!currentUser) {
-      setShowLoginModal(true);
-      return;
-    }
-
     if (poll.allow_multiple) {
       if (selectedOptionIds.includes(optionId)) {
         setSelectedOptionIds(selectedOptionIds.filter(id => id !== optionId));
@@ -70,8 +91,13 @@ export const PollCard: React.FC<PollCardProps> = ({
     }
   };
 
-  const handleVoteSubmit = async () => {
-    if (!currentUser) {
+  const handleVoteSubmit = async (overrideUser?: any) => {
+    setErrorMsg(null);
+    setSuccessMsg(null);
+
+    const userToUse = overrideUser || getAuthenticatedUser(currentUser);
+
+    if (!userToUse) {
       setShowLoginModal(true);
       return;
     }
@@ -83,27 +109,26 @@ export const PollCard: React.FC<PollCardProps> = ({
 
     try {
       setIsSubmitting(true);
-      setErrorMsg(null);
 
       const res = await fetch(`/api/polls/${poll.id}/vote`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           optionIds: selectedOptionIds,
-          userId: currentUser.email || currentUser.id
+          userId: userToUse.email || userToUse.id
         })
       });
 
       const d = await res.json();
 
-      if (d.success && d.poll) {
+      if (res.ok && d.success && d.poll) {
         setPoll(d.poll);
         setIsEditing(false);
-        setSuccessMsg(d.message || "Your vote has been recorded!");
-        setTimeout(() => setSuccessMsg(null), 4000);
+        setSuccessMsg("Vote counted successfully.");
+        setTimeout(() => setSuccessMsg(null), 5000);
         if (onVoteSuccess) onVoteSuccess(d.poll);
       } else {
-        if (d.requireLogin) {
+        if (d.requireLogin || res.status === 401 || d.code === "LOGIN_REQUIRED") {
           setShowLoginModal(true);
         } else {
           setErrorMsg(d.message || "Failed to record vote.");
@@ -117,17 +142,13 @@ export const PollCard: React.FC<PollCardProps> = ({
   };
 
   const triggerAuthModal = (mode: "login" | "signup") => {
+    setShowLoginModal(false);
     window.dispatchEvent(
       new CustomEvent("paisa-trigger-auth", {
         detail: {
-          feature: "Teacher Opinion Polls",
-          onSuccess: () => {
-            // Refetch current poll after auth success
-            fetch(`/api/polls/${poll.id}`)
-              .then(res => res.json())
-              .then(d => {
-                if (d.success && d.poll) setPoll(d.poll);
-              });
+          feature: "Opinion Polls",
+          onSuccess: (loggedUser: any) => {
+            handleVoteSubmit(loggedUser);
           }
         }
       })
@@ -305,13 +326,19 @@ export const PollCard: React.FC<PollCardProps> = ({
           </div>
 
           <div>
-            {!currentUser ? (
+            {!activeUser && (!poll.user_votes || poll.user_votes.length === 0) ? (
               <button
-                onClick={() => setShowLoginModal(true)}
+                onClick={() => {
+                  if (selectedOptionIds.length > 0) {
+                    handleVoteSubmit();
+                  } else {
+                    setShowLoginModal(true);
+                  }
+                }}
                 className="px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer"
               >
                 <Vote className="w-3.5 h-3.5" />
-                <span>Vote Now</span>
+                <span>{selectedOptionIds.length > 0 ? "Submit Vote" : "Vote Now"}</span>
               </button>
             ) : hasVoted && !isEditing ? (
               <div className="flex items-center gap-2">

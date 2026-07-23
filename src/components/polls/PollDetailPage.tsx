@@ -205,14 +205,35 @@ export const PollDetailPage: React.FC<PollDetailPageProps> = ({
     return allPolls.filter(p => p.id !== poll.id).slice(0, 3);
   }, [allPolls, poll]);
 
+  const getAuthenticatedUser = (userCandidate?: any) => {
+    if (
+      userCandidate &&
+      userCandidate.email &&
+      userCandidate.email.toLowerCase().trim() !== "guest@paisablueprint.in"
+    ) {
+      return userCandidate;
+    }
+    try {
+      const saved = localStorage.getItem("paisa_active_session");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (
+          parsed &&
+          parsed.email &&
+          parsed.email.toLowerCase().trim() !== "guest@paisablueprint.in"
+        ) {
+          return parsed;
+        }
+      }
+    } catch {}
+    return null;
+  };
+
+  const activeUser = getAuthenticatedUser(sessionUser);
+
   const handleOptionToggle = (optionId: string) => {
     if (!poll) return;
     setErrorMsg(null);
-    if (!sessionUser) {
-      setShowLoginModal(true);
-      return;
-    }
-
     if (poll.allow_multiple) {
       if (selectedOptionIds.includes(optionId)) {
         setSelectedOptionIds(selectedOptionIds.filter(id => id !== optionId));
@@ -224,9 +245,14 @@ export const PollDetailPage: React.FC<PollDetailPageProps> = ({
     }
   };
 
-  const handleVoteSubmit = async () => {
+  const handleVoteSubmit = async (overrideUser?: any) => {
     if (!poll) return;
-    if (!sessionUser) {
+    setErrorMsg(null);
+    setSuccessMsg(null);
+
+    const userToUse = overrideUser || getAuthenticatedUser(sessionUser);
+
+    if (!userToUse) {
       setShowLoginModal(true);
       return;
     }
@@ -238,24 +264,28 @@ export const PollDetailPage: React.FC<PollDetailPageProps> = ({
 
     try {
       setIsSubmitting(true);
-      setErrorMsg(null);
 
       const res = await fetch(`/api/polls/${poll.id}/vote`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           optionIds: selectedOptionIds,
-          userId: sessionUser.email || sessionUser.id
+          userId: userToUse.email || userToUse.id
         })
       });
 
       const d = await res.json();
-      if (d.success && d.poll) {
+      if (res.ok && d.success && d.poll) {
         setPoll(d.poll);
         setIsEditing(false);
-        setSuccessMsg(d.message || "Your vote has been successfully cast!");
+        setSuccessMsg("Vote counted successfully.");
+        setTimeout(() => setSuccessMsg(null), 5000);
       } else {
-        setErrorMsg(d.message || "Failed to record vote.");
+        if (d.requireLogin || res.status === 401 || d.code === "LOGIN_REQUIRED") {
+          setShowLoginModal(true);
+        } else {
+          setErrorMsg(d.message || "Failed to record vote.");
+        }
       }
     } catch (err) {
       console.error("[VOTE ERROR]", err);
@@ -285,9 +315,16 @@ export const PollDetailPage: React.FC<PollDetailPageProps> = ({
 
   const triggerAuthModal = (mode: "login" | "signup") => {
     setShowLoginModal(false);
-    if (typeof window !== "undefined") {
-      window.location.href = `/${mode}`;
-    }
+    window.dispatchEvent(
+      new CustomEvent("paisa-trigger-auth", {
+        detail: {
+          feature: "Opinion Polls",
+          onSuccess: (loggedUser: any) => {
+            handleVoteSubmit(loggedUser);
+          }
+        }
+      })
+    );
   };
 
   if (loading) {
@@ -536,13 +573,19 @@ export const PollDetailPage: React.FC<PollDetailPageProps> = ({
             </div>
 
             <div className="flex items-center gap-3 w-full sm:w-auto">
-              {!sessionUser ? (
+              {!activeUser && (!poll.user_votes || poll.user_votes.length === 0) ? (
                 <button
-                  onClick={() => setShowLoginModal(true)}
+                  onClick={() => {
+                    if (selectedOptionIds.length > 0) {
+                      handleVoteSubmit();
+                    } else {
+                      setShowLoginModal(true);
+                    }
+                  }}
                   className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-amber-950 font-black rounded-xl text-sm flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer"
                 >
                   <Vote className="w-4 h-4" />
-                  <span>Log In to Vote</span>
+                  <span>{selectedOptionIds.length > 0 ? "Submit Vote" : "Log In to Vote"}</span>
                 </button>
               ) : hasVoted && !isEditing ? (
                 <div className="flex items-center gap-2">
